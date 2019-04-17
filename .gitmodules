@@ -1,0 +1,3 @@
+[submodule "MiniLua"]
+	path = MiniLua
+	url = git@github.com:ThomasWitte/MiniLua.git

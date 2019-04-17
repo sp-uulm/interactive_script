@@ -1,0 +1,9 @@
+include/interactive_script
+include
+/opt/ros/melodic/include
+../../build/interactive_script/
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets
+/usr/include/x86_64-linux-gnu/qt5/QtGui
+/usr/include/x86_64-linux-gnu/qt5/QtCore
+MiniLua/include
+src/interactive_script_plugin
