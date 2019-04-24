@@ -10,7 +10,7 @@
 #include <ui_interactive_script_plugin.h>
 #include <QWidget>
 #include <memory>
-#include <interactive_script/marker_interface.h>
+#include <interactive_script/builtins.h>
 
 namespace interactive_script_plugin
 {
@@ -32,19 +32,16 @@ public:
   // Comment in to signal that the plugin has a way to configure it
   // bool hasConfiguration() const;
   // void triggerConfiguration();
-private:
   Ui::InteractiveScriptWidget ui_;
+private:
   QWidget* widget_ = nullptr;
-  std::shared_ptr<_LuaChunk> parse_result;
-  MarkerInterface marker;
 
-signals:
-    void changeEditorText(QString);
+  VisualizationInterpreter vis;
 
 public slots:
     void onChangeEditorText(QString);
     void onTextChanged();
-    void updateMarkerInterface() {marker.update();}
+    void updateMarkerInterface() {vis.marker.update();}
 };
 
 }  // namespace rqt_graph_editor

@@ -2,6 +2,7 @@
 #define MARKER_INTERFACE_H
 
 #include <interactive_markers/interactive_marker_server.h>
+#include <quad_common_utils/geometry_msg_helper.h>
 #include <ros/ros.h>
 #include <string>
 #include <functional>
@@ -24,6 +25,9 @@ public:
                   bool free_x = false, bool free_y = false, bool free_z = false,
                   interactive_markers::InteractiveMarkerServer::FeedbackCallback func = [](const auto&){});
     void addLine(double x, double y, double z, double x2, double y2, double z2);
+    void addPose(double x, double y, double z, double psi,
+                  bool free_x = false, bool free_y = false, bool free_z = false, bool free_psi = false,
+                  interactive_markers::InteractiveMarkerServer::FeedbackCallback func = [](const auto&){});
 
 };
 
