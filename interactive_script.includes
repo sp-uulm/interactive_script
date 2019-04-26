@@ -8,3 +8,4 @@ include
 MiniLua/include
 src/interactive_script_plugin
 ../quad_common_utils/include
+../../devel/include

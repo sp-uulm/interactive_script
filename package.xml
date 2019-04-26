@@ -54,6 +54,8 @@
   <depend>rqt_gui_cpp</depend>
   <depend>interactive_markers</depend>
   <depend>quad_common_utils</depend>
+  <depend>actionlib</depend>
+  <depend>hector_uav_msgs</depend>
  
   <!-- The export tag contains other, unspecified, tags -->
   <export>

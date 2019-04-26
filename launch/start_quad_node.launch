@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="trajectory_assignment" default="/trajectory_assignment"/>
+  <arg name="trajectory_request" default="/trajectory_request"/>
+  
+    <!-- trajectory_server_node -->
+    <node name="trajectory_server_node"
+          pkg="trajectory_server"
+          type="trajectory_server_node"
+          output="screen"
+          required="true">
+      <param name="trajectory_request_input"
+             type="string"
+             value="$(arg trajectory_request)"/>
+      <param name="trajectory_assignment_output"
+             type="string"
+             value="$(arg trajectory_assignment)"/>
+    </node>
+
+    <!-- trajectory_client_node -->
+    <node name="trajectory_client_node"
+          pkg="trajectory_server"
+          type="trajectory_client_node"
+          output="screen"
+          required="true">
+      <param name="x"
+             type="double"
+             value="0" />
+      <param name="y"
+             type="double"
+             value="0" />
+      <param name="name"
+             type="string"
+             value="quad" />
+      <param name="trajectory_assignment_input"
+             type="string"
+             value="$(arg trajectory_assignment)" />
+      <param name="trajectory_request_output"
+             type="string"
+             value="$(arg trajectory_request)" />
+    </node>
+
+    <!-- quad_node -->
+    <node name="quad_node"
+          pkg="trajectory_server"
+          type="quad_node"
+          output="screen"
+          required="true">
+      <param name="name"
+             type="string"
+             value="quad" />
+      <param name="delay"
+             type="double"
+             value="0.2" />
+      <param name="x"
+             type="double"
+             value="0" />
+      <param name="y"
+             type="double"
+             value="0" />
+      <param name="z"
+             type="double"
+             value="0" />
+    </node>
+</launch>

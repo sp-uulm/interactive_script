@@ -99,7 +99,7 @@ void MarkerInterface::addPoint(double x, double y, double z,
     server.insert(int_marker, func);
 }
 
-void MarkerInterface::addLine(double x, double y, double z, double x2, double y2, double z2) {
+void MarkerInterface::addLine(double x, double y, double z, double x2, double y2, double z2, Color color, double width) {
     // create an interactive marker for our server
     visualization_msgs::InteractiveMarker int_marker;
     int_marker.header.frame_id = "world";
@@ -109,14 +109,25 @@ void MarkerInterface::addLine(double x, double y, double z, double x2, double y2
 
     // create a grey box marker
     visualization_msgs::Marker box_marker;
-    box_marker.type = visualization_msgs::Marker::LINE_STRIP;
-    box_marker.scale.x = 0.1;
-    box_marker.scale.y = 0.1;
-    box_marker.scale.z = 0.1;
-    box_marker.color.r = 1.0;
-    box_marker.color.g = 1.0;
-    box_marker.color.b = 1.0;
-    box_marker.color.a = 1.0;
+    box_marker.type = visualization_msgs::Marker::ARROW;
+    box_marker.scale.x = width;
+    box_marker.scale.y = width*1.5;
+    box_marker.scale.z = width*5;
+
+    switch (color) {
+    case Color::WHITE:
+        box_marker.color.r = 1.0;
+        box_marker.color.g = 1.0;
+        box_marker.color.b = 1.0;
+        box_marker.color.a = 1.0;
+        break;
+    case Color::RED:
+        box_marker.color.r = 1.0;
+        box_marker.color.g = 0.0;
+        box_marker.color.b = 0.0;
+        box_marker.color.a = 1.0;
+        break;
+    }
 
     geometry_msgs::Point p1;
     p1.x = x;

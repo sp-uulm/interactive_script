@@ -13,6 +13,8 @@ find_package(catkin REQUIRED COMPONENTS
   rqt_gui_cpp
   interactive_markers
   quad_common_utils
+  actionlib
+  hector_uav_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -118,12 +120,14 @@ catkin_package(
 set(interactive_script_plugin_SRCS
     src/interactive_script_plugin/interactive_script_plugin.cpp
     src/interactive_script_plugin/marker_interface.cpp
+    src/interactive_script_plugin/quad_interface.cpp
     src/interactive_script_plugin/builtins.cpp
 )
 
 set(interactive_script_plugin_HDRS
     include/interactive_script/interactive_script_plugin.h
     include/interactive_script/marker_interface.h
+    include/interactive_script/quad_interface.h
     include/interactive_script/builtins.h
 )
 

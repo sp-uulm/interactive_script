@@ -37,10 +37,14 @@ private:
   QWidget* widget_ = nullptr;
 
   VisualizationInterpreter vis;
+  LiveScriptInterpreter live;
 
 public slots:
     void onChangeEditorText(QString);
+    void onClearTerminal();
+    void onAppendTerminal(QString);
     void onTextChanged();
+    void onRunScriptClicked();
     void updateMarkerInterface() {vis.marker.update();}
 };
 

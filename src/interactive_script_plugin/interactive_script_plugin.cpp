@@ -12,7 +12,7 @@ namespace interactive_script_plugin
 {
 
 InteractiveScriptGui::InteractiveScriptGui()
-  : rqt_gui_cpp::Plugin(), vis(&ui_)
+  : rqt_gui_cpp::Plugin()
 {
   // Constructor is called first before initPlugin function, needless to say.
 
@@ -36,8 +36,23 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
     connect(ui_.editor, &QPlainTextEdit::textChanged,
             this, &InteractiveScriptGui::onTextChanged);
 
+    connect(ui_.run_button, &QPushButton::clicked,
+            this, &InteractiveScriptGui::onRunScriptClicked);
+
     connect(&vis.signal, &SignalObject::changeEditorText,
             this, &InteractiveScriptGui::onChangeEditorText);
+    connect(&vis.signal, &SignalObject::clearTerminal,
+            this, &InteractiveScriptGui::onClearTerminal);
+    connect(&vis.signal, &SignalObject::appendTerminal,
+            this, &InteractiveScriptGui::onAppendTerminal);
+
+    connect(&live.signal, &SignalObject::changeEditorText,
+            this, &InteractiveScriptGui::onChangeEditorText);
+    connect(&live.signal, &SignalObject::clearTerminal,
+            this, &InteractiveScriptGui::onClearTerminal);
+    connect(&live.signal, &SignalObject::appendTerminal,
+            this, &InteractiveScriptGui::onAppendTerminal);
+
 
     setlocale(LC_ALL, "C");
     onTextChanged();
@@ -70,9 +85,22 @@ void InteractiveScriptGui::onChangeEditorText(QString s) {
     ui_.editor->setPlainText(s);
 }
 
-void InteractiveScriptGui::onTextChanged() {
-    vis.run_script();
+void InteractiveScriptGui::onClearTerminal() {
+    ui_.terminal->setPlainText("");
 }
+
+void InteractiveScriptGui::onAppendTerminal(QString s) {
+    ui_.terminal->appendPlainText(s);
+}
+
+void InteractiveScriptGui::onTextChanged() {
+    vis.run_script(ui_.editor->toPlainText().toStdString());
+}
+
+void InteractiveScriptGui::onRunScriptClicked() {
+    live.run_script(ui_.editor->toPlainText().toStdString());
+}
+
 
 /*bool hasConfiguration() const
 {
