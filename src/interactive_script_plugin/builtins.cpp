@@ -83,7 +83,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                            args[1].source.get(),
                            args[2].source.get(),
                            args[3].source.get(),
-                    [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, psi_source = args[3].source, this, tokens = parser.tokens](const auto& feedback) mutable {
+                    [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, psi_source = args[3].source, this, tokens = parser.tokens, original_psi = get<double>(args[3])](const auto& feedback) mutable {
                         if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
                             lua::rt::SourceChangeAnd changes;
                             if (x_source && feedback->control_name == "move_x") {
@@ -99,7 +99,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                                     changes.changes.push_back(*change);
                             }
                             if (psi_source && feedback->control_name == "move_psi") {
-                                if (const auto& change = psi_source->forceValue(yaw(feedback->pose.orientation)))
+                                if (const auto& change = psi_source->forceValue(fmod(yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
                                     changes.changes.push_back(*change);
                             }
                             changes.apply(tokens);
@@ -275,7 +275,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         }
         marker.addPose(get<double>(args[0]), get<double>(args[1]), get<double>(args[2]), get<double>(args[3]),
                                     args[0].source.get(), args[1].source.get(), args[2].source.get(), args[3].source.get(),
-            [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, psi_source = args[3].source, this, tokens = parser.tokens](const auto& feedback) mutable {
+            [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, psi_source = args[3].source, this, tokens = parser.tokens, original_psi = get<double>(args[3])](const auto& feedback) mutable {
                 if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
                     lua::rt::SourceChangeAnd changes;
                     if (x_source && feedback->control_name == "move_x") {
@@ -291,7 +291,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                             changes.changes.push_back(*change);
                     }
                     if (psi_source && feedback->control_name == "move_psi") {
-                        if (const auto& change = psi_source->forceValue(yaw(feedback->pose.orientation)))
+                        if (const auto& change = psi_source->forceValue(fmod(yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
                             changes.changes.push_back(*change);
                     }
                     changes.apply(tokens);

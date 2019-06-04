@@ -171,7 +171,7 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     int_marker.pose.position.x = x;
     int_marker.pose.position.y = y;
     int_marker.pose.position.z = z;
-    int_marker.pose.orientation = geometry_msgs::quaternion(0,0,psi);
+    int_marker.pose.orientation = geometry_msgs::quaternion();
 
     // create a grey box marker
     visualization_msgs::Marker box_marker;
@@ -183,6 +183,7 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     box_marker.color.g = 1.0;
     box_marker.color.b = 1.0;
     box_marker.color.a = 1.0;
+    box_marker.pose.orientation = geometry_msgs::quaternion(0,0,psi);
 
     visualization_msgs::Marker arrow_marker;
     arrow_marker.type = visualization_msgs::Marker::ARROW;
@@ -193,12 +194,14 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     arrow_marker.color.g = 1.0;
     arrow_marker.color.b = 1.0;
     arrow_marker.color.a = 1.0;
+    arrow_marker.pose.orientation = geometry_msgs::quaternion(0,0,psi);
 
     // create a non-interactive control which contains the box
     visualization_msgs::InteractiveMarkerControl box_control;
     box_control.always_visible = true;
     box_control.markers.push_back( box_marker );
     box_control.markers.push_back( arrow_marker );
+    //box_control.orientation = geometry_msgs::quaternion(0,0,psi);
 
     // add the control to the interactive marker
     int_marker.controls.push_back( box_control );
