@@ -150,17 +150,35 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
 
         table& tab_target = *get<table_p>(target);
 
-        marker.addLine(tab_pose[string{"x"}].def_number(),
-                       tab_pose[string{"y"}].def_number(),
-                       tab_pose[string{"z"}].def_number(),
-                       tab_target[string{"x"}].def_number(),
-                       tab_target[string{"y"}].def_number(),
-                       tab_target[string{"z"}].def_number());
+        val px = tab_pose[string{"x"}].def_number();
+        val py = tab_pose[string{"y"}].def_number();
+        val pz = tab_pose[string{"z"}].def_number();
+        val tx = tab_target[string{"x"}];
+        val ty = tab_target[string{"y"}];
+        val tz = tab_target[string{"z"}];
 
-        tab_pose[string{"x"}] = tab_target[string{"x"}];
-        tab_pose[string{"y"}] = tab_target[string{"y"}];
-        tab_pose[string{"z"}] = tab_target[string{"z"}];
-        tab_pose[string{"psi"}] = tab_target[string{"psi"}];
+        try {
+            val length = unwrap(op_sqrt(
+                      ((tx - px)^2.0)
+                    + ((ty - py)^2.0)
+                    + ((tz - pz)^2.0)));
+
+            val duration = length / 1.0; // 1 m/s
+
+            tab_pose[string{"x"}] = (tx - px) * clamp(args[0]/duration, val(0.0), val(1.0)) + px;
+            tab_pose[string{"y"}] = (ty - py) * clamp(args[0]/duration, val(0.0), val(1.0)) + py;
+            tab_pose[string{"z"}] = (tz - pz) * clamp(args[0]/duration, val(0.0), val(1.0)) + pz;
+            tab_pose[string{"psi"}] = tab_target[string{"psi"}];
+        } catch (const runtime_error& err) {
+            return string{err.what()};
+        }
+
+        marker.addLine(get<double>(px),
+                       get<double>(py),
+                       get<double>(pz),
+                       tab_pose[string{"x"}].def_number(),
+                       tab_pose[string{"y"}].def_number(),
+                       tab_pose[string{"z"}].def_number());
 
         return {};
     }), false);

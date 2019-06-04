@@ -27,6 +27,8 @@ geometry_msgs::Pose QuadcopterInterface::get_current_pose() {
     return current_position;
 }
 
-bool QuadcopterInterface::is_at_target() {
-    return current_target == current_position;
+bool QuadcopterInterface::is_at_target(double tolerance) {
+    return fabs(current_target.position.x - current_position.position.x) < tolerance
+        && fabs(current_target.position.y - current_position.position.y) < tolerance
+        && fabs(current_target.position.z - current_position.position.z) < tolerance;
 }

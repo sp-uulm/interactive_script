@@ -19,7 +19,7 @@ struct QuadcopterInterface {
 
     void send_new_waypoint(const geometry_msgs::Pose& target);
     geometry_msgs::Pose get_current_pose();
-    bool is_at_target();
+    bool is_at_target(double tolerance = 0.1);
 };
 
 #endif // QUAD_INTERFACE_H
