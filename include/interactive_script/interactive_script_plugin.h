@@ -21,26 +21,29 @@ class InteractiveScriptGui
   Q_OBJECT
 
 public:
-  InteractiveScriptGui();
-  virtual void initPlugin(qt_gui_cpp::PluginContext& context);
-  virtual void shutdownPlugin();
-  virtual void saveSettings(qt_gui_cpp::Settings& plugin_settings,
+    InteractiveScriptGui();
+    virtual void initPlugin(qt_gui_cpp::PluginContext& context);
+    virtual void shutdownPlugin();
+    virtual void saveSettings(qt_gui_cpp::Settings& plugin_settings,
       qt_gui_cpp::Settings& instance_settings) const;
-  virtual void restoreSettings(const qt_gui_cpp::Settings& plugin_settings,
+    virtual void restoreSettings(const qt_gui_cpp::Settings& plugin_settings,
       const qt_gui_cpp::Settings& instance_settings);
 
-  // Comment in to signal that the plugin has a way to configure it
-  // bool hasConfiguration() const;
-  // void triggerConfiguration();
-  Ui::InteractiveScriptWidget ui_;
+    // Comment in to signal that the plugin has a way to configure it
+    // bool hasConfiguration() const;
+    // void triggerConfiguration();
+    Ui::InteractiveScriptWidget ui_;
 private:
-  QWidget* widget_ = nullptr;
+    QWidget* widget_ = nullptr;
 
-  VisualizationInterpreter vis;
-  LiveScriptInterpreter live;
+    VisualizationInterpreter vis;
+    LiveScriptInterpreter live;
 
+    bool eval_paused = false;
 public slots:
     void onChangeEditorText(QString);
+    void onHighlightTokens(TokenMessage);
+    void onPauseEval(bool);
     void onClearTerminal();
     void onAppendTerminal(QString);
     void onTextChanged();

@@ -7,6 +7,7 @@
 #include <pluginlib/class_list_macros.h>
 #include <QStringList>
 #include <QTimer>
+#include <QTextCursor>
 
 namespace interactive_script_plugin
 {
@@ -33,6 +34,8 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
 
     ui_.terminal->setStyleSheet("background-color: dimgray; color: white");
 
+    qRegisterMetaType<TokenMessage>();
+
     connect(ui_.editor, &QPlainTextEdit::textChanged,
             this, &InteractiveScriptGui::onTextChanged);
 
@@ -45,6 +48,10 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
             this, &InteractiveScriptGui::onClearTerminal);
     connect(&vis.signal, &SignalObject::appendTerminal,
             this, &InteractiveScriptGui::onAppendTerminal);
+    connect(&vis.signal, &SignalObject::highlightTokens,
+            this, &InteractiveScriptGui::onHighlightTokens);
+    connect(&vis.signal, &SignalObject::pauseEval,
+            this, &InteractiveScriptGui::onPauseEval);
 
     connect(&live.signal, &SignalObject::changeEditorText,
             this, &InteractiveScriptGui::onChangeEditorText);
@@ -52,6 +59,8 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
             this, &InteractiveScriptGui::onClearTerminal);
     connect(&live.signal, &SignalObject::appendTerminal,
             this, &InteractiveScriptGui::onAppendTerminal);
+    connect(&live.signal, &SignalObject::highlightTokens,
+            this, &InteractiveScriptGui::onHighlightTokens);
 
 
     setlocale(LC_ALL, "C");
@@ -81,6 +90,33 @@ void InteractiveScriptGui::restoreSettings(const qt_gui_cpp::Settings& /*plugin_
   // v = instance_settings.value(k)
 }
 
+void InteractiveScriptGui::onHighlightTokens(TokenMessage tokens) {
+    QTextCharFormat fmt;
+
+    QTextCursor cursor(ui_.editor->document());
+
+    // remove previous highlights
+    cursor.setPosition(0, QTextCursor::MoveAnchor);
+    cursor.setPosition(ui_.editor->document()->toPlainText().length(), QTextCursor::KeepAnchor);
+    cursor.setCharFormat(fmt);
+
+    for (const auto& t : tokens) {
+        //cout << "highlight: " << t << endl;
+
+        fmt.setBackground(Qt::red);
+
+        cursor.setPosition(t.pos, QTextCursor::MoveAnchor);
+        cursor.setPosition(t.pos+t.length, QTextCursor::KeepAnchor);
+        cursor.setCharFormat(fmt);
+    }
+}
+
+void InteractiveScriptGui::onPauseEval(bool pause) {
+    eval_paused = pause;
+    if (!eval_paused)
+        vis.run_script(ui_.editor->toPlainText().toStdString());
+}
+
 void InteractiveScriptGui::onChangeEditorText(QString s) {
     ui_.editor->setPlainText(s);
 }
@@ -94,7 +130,19 @@ void InteractiveScriptGui::onAppendTerminal(QString s) {
 }
 
 void InteractiveScriptGui::onTextChanged() {
-    vis.run_script(ui_.editor->toPlainText().toStdString());
+    if (!eval_paused) {
+
+        // remove all highlights and avoid recursion
+        eval_paused = true;
+        QTextCharFormat fmt;
+        QTextCursor cursor(ui_.editor->document());
+        cursor.setPosition(0, QTextCursor::MoveAnchor);
+        cursor.setPosition(ui_.editor->document()->toPlainText().length(), QTextCursor::KeepAnchor);
+        cursor.setCharFormat(fmt);
+        eval_paused = false;
+
+        vis.run_script(ui_.editor->toPlainText().toStdString());
+    }
 }
 
 void InteractiveScriptGui::onRunScriptClicked() {

@@ -11,16 +11,22 @@
 
 using Gui = Ui::InteractiveScriptWidget;
 
+using TokenMessage = vector<LuaToken>;
+Q_DECLARE_METATYPE(TokenMessage);
+
 /* The syntax highlighting goes completely haywire in the context of QObjects
  * and VisualizationInterpreter does not include the plugin header for the same
  * reason. To connect the two the signal object is used
 */
 struct SignalObject : QObject {
     Q_OBJECT
+
 signals:
     void changeEditorText(QString);
     void clearTerminal();
     void appendTerminal(QString);
+    void highlightTokens(TokenMessage);
+    void pauseEval(bool);
 };
 
 struct Interpreter {

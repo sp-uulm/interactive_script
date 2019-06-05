@@ -102,8 +102,13 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                                 if (const auto& change = psi_source->forceValue(fmod(yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
                                     changes.changes.push_back(*change);
                             }
-                            changes.apply(tokens);
+
+                            // make sure the script is only executed once after all highlights are set
+                            signal.pauseEval(true);
+                            auto modified_tokens = changes.apply(tokens);
                             signal.changeEditorText(QString::fromStdString(get_string(tokens)));
+                            signal.highlightTokens(modified_tokens);
+                            signal.pauseEval(false);
                         }
                     });
 
@@ -249,8 +254,13 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                         if (const auto& change = z_source->forceValue(feedback->pose.position.z))
                             changes.changes.push_back(*change);
                     }
-                    changes.apply(tokens);
+
+                    // make sure the script is only executed once after all highlights are set
+                    signal.pauseEval(true);
+                    auto modified_tokens = changes.apply(tokens);
                     signal.changeEditorText(QString::fromStdString(get_string(tokens)));
+                    signal.highlightTokens(modified_tokens);
+                    signal.pauseEval(false);
                 }
             });
         return {};
@@ -294,8 +304,13 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                         if (const auto& change = psi_source->forceValue(fmod(yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
                             changes.changes.push_back(*change);
                     }
-                    changes.apply(tokens);
+
+                    // make sure the script is only executed once after all highlights are set
+                    signal.pauseEval(true);
+                    auto modified_tokens = changes.apply(tokens);
                     signal.changeEditorText(QString::fromStdString(get_string(tokens)));
+                    signal.highlightTokens(modified_tokens);
+                    signal.pauseEval(false);
                 }
             });
         return {};
