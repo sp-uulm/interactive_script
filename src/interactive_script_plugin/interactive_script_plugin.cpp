@@ -91,6 +91,9 @@ void InteractiveScriptGui::restoreSettings(const qt_gui_cpp::Settings& /*plugin_
 }
 
 void InteractiveScriptGui::onHighlightTokens(TokenMessage tokens) {
+    bool old_eval_paused = eval_paused;
+    eval_paused = true;
+
     QTextCharFormat fmt;
 
     QTextCursor cursor(ui_.editor->document());
@@ -104,11 +107,14 @@ void InteractiveScriptGui::onHighlightTokens(TokenMessage tokens) {
         //cout << "highlight: " << t << endl;
 
         fmt.setBackground(Qt::red);
+        fmt.setForeground(Qt::white);
 
         cursor.setPosition(t.pos, QTextCursor::MoveAnchor);
         cursor.setPosition(t.pos+t.length, QTextCursor::KeepAnchor);
         cursor.setCharFormat(fmt);
     }
+
+    eval_paused = false;
 }
 
 void InteractiveScriptGui::onPauseEval(bool pause) {

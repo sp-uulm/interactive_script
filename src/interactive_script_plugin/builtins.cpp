@@ -353,7 +353,7 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
         return {};
     }), false);
 
-    env.assign(string {"sleep"}, make_shared<lua::rt::cfunction>([this, cancelled](const lua::rt::vallist& args) -> cfunction::result {
+    env.assign(string {"sleep"}, make_shared<lua::rt::cfunction>([this, cancelled](const lua::rt::vallist& args, const _LuaFunctioncall stmt) -> cfunction::result {
         if (*cancelled)
             return string {"Script execution cancelled!"};
 
@@ -361,6 +361,8 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
             signal.appendTerminal("sleep requires a number argument");
             return {nil()};
         }
+
+        signal.highlightTokens(stmt.tokens);
 
         std::this_thread::sleep_for(chrono::milliseconds(static_cast<long>(get<double>(args[0])*1000)));
 
