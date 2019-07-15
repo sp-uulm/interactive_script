@@ -369,7 +369,7 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
         return {};
     }), false);
 
-    env.assign(string {"wait"}, make_shared<lua::rt::cfunction>([this, cancelled](const lua::rt::vallist& args) -> cfunction::result {
+    env.assign(string {"wait"}, make_shared<lua::rt::cfunction>([this, cancelled](const lua::rt::vallist& args, const _LuaFunctioncall stmt) -> cfunction::result {
         if (*cancelled)
             return string {"Script execution cancelled!"};
 
@@ -377,6 +377,8 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
             signal.appendTerminal("wait requires no arguments");
             return {nil()};
         }
+
+        signal.highlightTokens(stmt.tokens);
 
         while (!quad.is_at_target()) {
             if (*cancelled)
