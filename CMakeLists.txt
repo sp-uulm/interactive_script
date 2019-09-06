@@ -15,6 +15,8 @@ find_package(catkin REQUIRED COMPONENTS
   quad_common_utils
   actionlib
   hector_uav_msgs
+  tf2
+  tf2_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -121,6 +123,7 @@ set(interactive_script_plugin_SRCS
     src/interactive_script_plugin/interactive_script_plugin.cpp
     src/interactive_script_plugin/marker_interface.cpp
     src/interactive_script_plugin/quad_interface.cpp
+    src/interactive_script_plugin/tf_interface.cpp
     src/interactive_script_plugin/builtins.cpp
 )
 
@@ -128,6 +131,7 @@ set(interactive_script_plugin_HDRS
     include/interactive_script/interactive_script_plugin.h
     include/interactive_script/marker_interface.h
     include/interactive_script/quad_interface.h
+    include/interactive_script/tf_interface.h
     include/interactive_script/builtins.h
 )
 

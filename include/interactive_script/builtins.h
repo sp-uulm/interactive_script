@@ -3,6 +3,7 @@
 
 #include "interactive_script/marker_interface.h"
 #include "interactive_script/quad_interface.h"
+#include "interactive_script/tf_interface.h"
 #include "luainterpreter.h"
 #include "luaparser.h"
 #include <quad_common_utils/async.h>
@@ -48,6 +49,7 @@ struct Interpreter {
 
 struct VisualizationInterpreter {
     MarkerInterface marker;
+    TfInterface tf;
     SignalObject signal;
 
     void run_script(const std::string& script);
@@ -58,6 +60,7 @@ struct LiveScriptInterpreter {
     LiveScriptInterpreter() {}
 
     QuadcopterInterface quad;
+    TfInterface tf;
     Async async;
     SignalObject signal;
 

@@ -15,7 +15,7 @@ void MarkerInterface::addPoint(double x, double y, double z,
                                interactive_markers::InteractiveMarkerServer::FeedbackCallback func) {
     // create an interactive marker for our server
     visualization_msgs::InteractiveMarker int_marker;
-    int_marker.header.frame_id = "world";
+    int_marker.header.frame_id = WORLD_FRAME;
     int_marker.header.stamp=ros::Time::now();
     int_marker.name = "point_marker_" + std::to_string(n++);
     //int_marker.description = "Simple 1-DOF Control";
@@ -102,7 +102,7 @@ void MarkerInterface::addPoint(double x, double y, double z,
 void MarkerInterface::addLine(double x, double y, double z, double x2, double y2, double z2, Color color, double width) {
     // create an interactive marker for our server
     visualization_msgs::InteractiveMarker int_marker;
-    int_marker.header.frame_id = "world";
+    int_marker.header.frame_id = WORLD_FRAME;
     int_marker.header.stamp=ros::Time::now();
     int_marker.name = "line_marker_" + std::to_string(n++);
     //int_marker.description = "Simple 1-DOF Control";
@@ -163,7 +163,7 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
                                interactive_markers::InteractiveMarkerServer::FeedbackCallback func) {
     // create an interactive marker for our server
     visualization_msgs::InteractiveMarker int_marker;
-    int_marker.header.frame_id = "world";
+    int_marker.header.frame_id = WORLD_FRAME;
     int_marker.header.stamp=ros::Time::now();
     int_marker.name = "pose_marker_" + std::to_string(n++);
     //int_marker.description = "Simple 1-DOF Control";

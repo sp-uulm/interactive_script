@@ -9,6 +9,8 @@
 
 class MarkerInterface {
 private:
+    static constexpr auto WORLD_FRAME = "world";
+
     ros::NodeHandle nh;
     interactive_markers::InteractiveMarkerServer server;
     int n = 0;
@@ -18,7 +20,7 @@ public:
         WHITE, RED
     };
 
-    MarkerInterface() : nh("MarkerInterface"), server("simple_marker") {
+    MarkerInterface() : server("simple_marker") {
     }
 
     void commit();

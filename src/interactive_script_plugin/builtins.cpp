@@ -225,8 +225,26 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         return {};
     }), false);
 
-    env.assign(string {"pose"}, make_shared<cfunction>([&env](const vallist& args) mutable -> cfunction::result {
-        return {env.getvar(string{"__quad_pose"})};
+    env.assign(string {"pose"}, make_shared<cfunction>([this, &env](const vallist& args) mutable -> cfunction::result {
+        if (args.size() == 0) {
+            return {env.getvar(string{"__quad_pose"})};
+        }
+
+        if (args.size() == 1 && args[0].isstring()) {
+            auto p = tf.get_pose(get<string>(args[0]));
+
+            val result = make_shared<table>();
+            table& t = *get<table_p>(result);
+            t[string{"x"}] = p ? p->position.x : 0;
+            t[string{"y"}] = p ? p->position.y : 0;
+            t[string{"z"}] = p ? p->position.z : 0;
+            t[string{"psi"}] = p ? yaw(p->orientation) : 0;
+
+            return {result};
+        }
+
+        signal.appendTerminal("invalid args to pose(object?)");
+        return {nil()};
     }), false);
 
     auto rviz = make_shared<table>();
@@ -407,14 +425,35 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
         if (*cancelled)
             return string {"Script execution cancelled!"};
 
-        auto p = quad.get_current_pose();
-        table_p t = make_shared<table>();
-        (*t)[string {"x"}] = p.position.x;
-        (*t)[string {"y"}] = p.position.y;
-        (*t)[string {"z"}] = p.position.x;
-        (*t)[string {"psi"}] = yaw(p.orientation);
+        if (args.size() == 0) {
+            auto p = quad.get_current_pose();
+            table_p t = make_shared<table>();
+            (*t)[string {"x"}] = p.position.x;
+            (*t)[string {"y"}] = p.position.y;
+            (*t)[string {"z"}] = p.position.x;
+            (*t)[string {"psi"}] = yaw(p.orientation);
 
-        return {t};
+            return {t};
+        }
+
+        if (args.size() == 1 && args[0].isstring()) {
+            auto p = geometry_msgs::origin();
+
+            if (auto _p = tf.get_pose(get<string>(args[0]))) {
+                p = *_p;
+            }
+
+            table_p t = make_shared<table>();
+            (*t)[string {"x"}] = p.position.x;
+            (*t)[string {"y"}] = p.position.y;
+            (*t)[string {"z"}] = p.position.x;
+            (*t)[string {"psi"}] = yaw(p.orientation);
+
+            return {t};
+        }
+
+        signal.appendTerminal("invalid args to pose(object?)");
+        return {nil()};
     }), false);
 
 }

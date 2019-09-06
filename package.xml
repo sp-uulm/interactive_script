@@ -56,7 +56,9 @@
   <depend>quad_common_utils</depend>
   <depend>actionlib</depend>
   <depend>hector_uav_msgs</depend>
- 
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
