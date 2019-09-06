@@ -44,7 +44,13 @@ void VisualizationInterpreter::run_script(const std::string& script) {
 }
 
 void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaParser& parser) {
-    env.assign(string {"print"}, make_shared<lua::rt::cfunction>([this](const lua::rt::vallist& args) -> cfunction::result {
+    env.assign("__quad_pose", make_shared<table>(
+        vector<pair<val, val>> {{"x", 0},{"y", 0},{"z", 0},{"psi", 0}}), false);
+
+    env.assign("__quad_target", make_shared<table>(
+        vector<pair<val, val>> {{"x", 0},{"y", 0},{"z", 0},{"psi", 0}}), false);
+
+    env.assign("print", make_shared<lua::rt::cfunction>([this](const lua::rt::vallist& args) -> cfunction::result {
         stringstream ss;
         for (int i = 0; i < static_cast<int>(args.size()) - 1; ++i) {
             ss << args[static_cast<unsigned>(i)].to_string() << "\t";
@@ -56,22 +62,12 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         return {};
     }), false);
 
-    env.assign(string {"moveTo"}, make_shared<cfunction>([this, &env, &parser](const vallist& args) mutable -> cfunction::result {
+    env.assign("moveTo", make_shared<cfunction>([this, &env, &parser](const vallist& args) mutable -> cfunction::result {
         if (args.size() == 4 && args[0].isnumber() && args[1].isnumber() && args[2].isnumber() && args[3].isnumber()) {
-            val target = env.getvar(string{"__quad_target"});
-            if (target.type() != "table") {
-                target = make_shared<table>();
-                env.assign(string{"__quad_target"}, target, false);
-            }
-
+            val target = env.getvar("__quad_target");
             table& tab_target = *get<table_p>(target);
 
-            val pose = env.getvar(string{"__quad_pose"});
-            if (pose.type() != "table") {
-                pose = make_shared<table>();
-                env.assign(string{"__quad_pose"}, pose, false);
-            }
-
+            val pose = env.getvar("__quad_pose");
             table& tab_pose = *get<table_p>(pose);
 
 
@@ -112,19 +108,19 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                         }
                     });
 
-            marker.addLine(tab_pose[string{"x"}].def_number(),
-                           tab_pose[string{"y"}].def_number(),
-                           tab_pose[string{"z"}].def_number(),
+            marker.addLine(tab_pose["x"].def_number(),
+                           tab_pose["y"].def_number(),
+                           tab_pose["z"].def_number(),
                            get<double>(args[0]),
                            get<double>(args[1]),
                            get<double>(args[2]),
                            MarkerInterface::Color::RED,
                            0.02);
 
-            tab_target[string{"x"}] = args[0];
-            tab_target[string{"y"}] = args[1];
-            tab_target[string{"z"}] = args[2];
-            tab_target[string{"psi"}] = args[3];
+            tab_target["x"] = args[0];
+            tab_target["y"] = args[1];
+            tab_target["z"] = args[2];
+            tab_target["psi"] = args[3];
 
             return {};
         }
@@ -133,47 +129,37 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         return {nil()};
     }), false);
 
-    env.assign(string {"sleep"}, make_shared<lua::rt::cfunction>([this, &env](const lua::rt::vallist& args) -> cfunction::result {
+    env.assign("sleep", make_shared<lua::rt::cfunction>([this, &env](const lua::rt::vallist& args) -> cfunction::result {
         if (args.size() != 1 || !args[0].isnumber()) {
             signal.appendTerminal("sleep requires a number argument");
             return {nil()};
         }
 
-        val pose = env.getvar(string{"__quad_pose"});
-        if (pose.type() != "table") {
-            pose = make_shared<table>();
-            env.assign(string{"__quad_pose"}, pose, false);
-        }
-
+        val pose = env.getvar("__quad_pose");
         table& tab_pose = *get<table_p>(pose);
 
-        val target = env.getvar(string{"__quad_target"});
-        if (target.type() != "table") {
-            target = make_shared<table>();
-            env.assign(string{"__quad_target"}, target, false);
-        }
-
+        val target = env.getvar("__quad_target");
         table& tab_target = *get<table_p>(target);
 
-        val px = tab_pose[string{"x"}].def_number();
-        val py = tab_pose[string{"y"}].def_number();
-        val pz = tab_pose[string{"z"}].def_number();
-        val tx = tab_target[string{"x"}];
-        val ty = tab_target[string{"y"}];
-        val tz = tab_target[string{"z"}];
+        val px = tab_pose["x"].def_number();
+        val py = tab_pose["y"].def_number();
+        val pz = tab_pose["z"].def_number();
+        val tx = tab_target["x"];
+        val ty = tab_target["y"];
+        val tz = tab_target["z"];
 
         try {
             val length = unwrap(op_sqrt(
-                      ((tx - px)^2.0)
-                    + ((ty - py)^2.0)
-                    + ((tz - pz)^2.0)));
+                      ((tx - px)^2)
+                    + ((ty - py)^2)
+                    + ((tz - pz)^2)));
 
             val duration = length / 1.0; // 1 m/s
 
-            tab_pose[string{"x"}] = (tx - px) * clamp(args[0]/duration, val(0.0), val(1.0)) + px;
-            tab_pose[string{"y"}] = (ty - py) * clamp(args[0]/duration, val(0.0), val(1.0)) + py;
-            tab_pose[string{"z"}] = (tz - pz) * clamp(args[0]/duration, val(0.0), val(1.0)) + pz;
-            tab_pose[string{"psi"}] = tab_target[string{"psi"}];
+            tab_pose["x"] = (tx - px) * clamp(args[0]/duration, val(0.0), val(1.0)) + px;
+            tab_pose["y"] = (ty - py) * clamp(args[0]/duration, val(0.0), val(1.0)) + py;
+            tab_pose["z"] = (tz - pz) * clamp(args[0]/duration, val(0.0), val(1.0)) + pz;
+            tab_pose["psi"] = tab_target["psi"];
         } catch (const runtime_error& err) {
             return string{err.what()};
         }
@@ -181,53 +167,43 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         marker.addLine(get<double>(px),
                        get<double>(py),
                        get<double>(pz),
-                       tab_pose[string{"x"}].def_number(),
-                       tab_pose[string{"y"}].def_number(),
-                       tab_pose[string{"z"}].def_number());
+                       tab_pose["x"].def_number(),
+                       tab_pose["y"].def_number(),
+                       tab_pose["z"].def_number());
 
         return {};
     }), false);
 
-    env.assign(string {"wait"}, make_shared<lua::rt::cfunction>([this, &env](const lua::rt::vallist& args) -> cfunction::result {
+    env.assign("wait", make_shared<lua::rt::cfunction>([this, &env](const lua::rt::vallist& args) -> cfunction::result {
         if (args.size() != 0) {
             signal.appendTerminal("wait requires no arguments");
             return {nil()};
         }
 
-        val pose = env.getvar(string{"__quad_pose"});
-        if (pose.type() != "table") {
-            pose = make_shared<table>();
-            env.assign(string{"__quad_pose"}, pose, false);
-        }
-
+        val pose = env.getvar("__quad_pose");
         table& tab_pose = *get<table_p>(pose);
 
-        val target = env.getvar(string{"__quad_target"});
-        if (target.type() != "table") {
-            target = make_shared<table>();
-            env.assign(string{"__quad_target"}, target, false);
-        }
-
+        val target = env.getvar("__quad_target");
         table& tab_target = *get<table_p>(target);
 
-        marker.addLine(tab_pose[string{"x"}].def_number(),
-                       tab_pose[string{"y"}].def_number(),
-                       tab_pose[string{"z"}].def_number(),
-                       tab_target[string{"x"}].def_number(),
-                       tab_target[string{"y"}].def_number(),
-                       tab_target[string{"z"}].def_number());
+        marker.addLine(tab_pose["x"].def_number(),
+                       tab_pose["y"].def_number(),
+                       tab_pose["z"].def_number(),
+                       tab_target["x"].def_number(),
+                       tab_target["y"].def_number(),
+                       tab_target["z"].def_number());
 
-        tab_pose[string{"x"}] = tab_target[string{"x"}];
-        tab_pose[string{"y"}] = tab_target[string{"y"}];
-        tab_pose[string{"z"}] = tab_target[string{"z"}];
-        tab_pose[string{"psi"}] = tab_target[string{"psi"}];
+        tab_pose["x"] = tab_target["x"];
+        tab_pose["y"] = tab_target["y"];
+        tab_pose["z"] = tab_target["z"];
+        tab_pose["psi"] = tab_target["psi"];
 
         return {};
     }), false);
 
-    env.assign(string {"pose"}, make_shared<cfunction>([this, &env](const vallist& args) mutable -> cfunction::result {
+    env.assign("pose", make_shared<cfunction>([this, &env](const vallist& args) mutable -> cfunction::result {
         if (args.size() == 0) {
-            return {env.getvar(string{"__quad_pose"})};
+            return {env.getvar("__quad_pose")};
         }
 
         if (args.size() == 1 && args[0].isstring()) {
@@ -235,10 +211,10 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
 
             val result = make_shared<table>();
             table& t = *get<table_p>(result);
-            t[string{"x"}] = p ? p->position.x : 0;
-            t[string{"y"}] = p ? p->position.y : 0;
-            t[string{"z"}] = p ? p->position.z : 0;
-            t[string{"psi"}] = p ? yaw(p->orientation) : 0;
+            t["x"] = p ? p->position.x : 0;
+            t["y"] = p ? p->position.y : 0;
+            t["z"] = p ? p->position.z : 0;
+            t["psi"] = p ? yaw(p->orientation) : 0;
 
             return {result};
         }
@@ -248,10 +224,10 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
     }), false);
 
     auto rviz = make_shared<table>();
-    env.assign(string {"rviz"}, rviz, false);
+    env.assign("rviz", rviz, false);
 
-    (*rviz)[string {"point"}] = make_shared<lua::rt::cfunction>([this, &parser](const lua::rt::vallist& args) -> cfunction::result {
-        if (args.size() != 3 || args[0].type() != "number" || args[1].type() != "number" || args[2].type() != "number") {
+    (*rviz)["point"] = make_shared<lua::rt::cfunction>([this, &parser](const lua::rt::vallist& args) -> cfunction::result {
+        if (args.size() != 3 || !args[0].isnumber() || !args[1].isnumber() || !args[2].isnumber()) {
             signal.appendTerminal("point requires 3 number arguments");
             return {nil()};
         }
@@ -284,10 +260,10 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         return {};
     });
 
-    (*rviz)[string {"line"}] = make_shared<lua::rt::cfunction>([this](const lua::rt::vallist& args) -> cfunction::result {
+    (*rviz)["line"] = make_shared<lua::rt::cfunction>([this](const lua::rt::vallist& args) -> cfunction::result {
         if (args.size() != 6
-                || args[0].type() != "number" || args[1].type() != "number" || args[2].type() != "number"
-                || args[3].type() != "number" || args[4].type() != "number" || args[5].type() != "number") {
+                || !args[0].isnumber() || !args[1].isnumber() || !args[2].isnumber()
+                || !args[3].isnumber() || !args[4].isnumber() || !args[5].isnumber()) {
             signal.appendTerminal("line requires 6 number arguments");
             return {nil()};
         }
@@ -296,7 +272,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         return {};
     });
 
-    (*rviz)[string {"pose"}] = make_shared<lua::rt::cfunction>([this, &parser](const lua::rt::vallist& args) -> cfunction::result {
+    (*rviz)["pose"] = make_shared<lua::rt::cfunction>([this, &parser](const lua::rt::vallist& args) -> cfunction::result {
         if (args.size() != 4 || !args[0].isnumber() || !args[1].isnumber() || !args[2].isnumber() || !args[3].isnumber()) {
             signal.appendTerminal("pose requires 4 number arguments");
             return {nil()};
@@ -355,7 +331,7 @@ void LiveScriptInterpreter::run_script(const std::string& script) {
 }
 
 void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const Async::cancel_t& cancelled) {
-    env.assign(string {"print"}, make_shared<lua::rt::cfunction>([this, cancelled](const lua::rt::vallist& args) -> cfunction::result {
+    env.assign("print", make_shared<lua::rt::cfunction>([this, cancelled](const lua::rt::vallist& args) -> cfunction::result {
         if (*cancelled)
             return string {"Script execution cancelled!"};
 
@@ -428,10 +404,10 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
         if (args.size() == 0) {
             auto p = quad.get_current_pose();
             table_p t = make_shared<table>();
-            (*t)[string {"x"}] = p.position.x;
-            (*t)[string {"y"}] = p.position.y;
-            (*t)[string {"z"}] = p.position.x;
-            (*t)[string {"psi"}] = yaw(p.orientation);
+            (*t)["x"] = p.position.x;
+            (*t)["y"] = p.position.y;
+            (*t)["z"] = p.position.x;
+            (*t)["psi"] = yaw(p.orientation);
 
             return {t};
         }
@@ -444,10 +420,10 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
             }
 
             table_p t = make_shared<table>();
-            (*t)[string {"x"}] = p.position.x;
-            (*t)[string {"y"}] = p.position.y;
-            (*t)[string {"z"}] = p.position.x;
-            (*t)[string {"psi"}] = yaw(p.orientation);
+            (*t)["x"] = p.position.x;
+            (*t)["y"] = p.position.y;
+            (*t)["z"] = p.position.x;
+            (*t)["psi"] = yaw(p.orientation);
 
             return {t};
         }
