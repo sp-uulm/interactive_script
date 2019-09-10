@@ -27,6 +27,10 @@ std::pair<Interpreter::ExecResult, std::string> Interpreter::dostring(const stri
 }
 
 void VisualizationInterpreter::run_script(const std::string& script) {
+    if (is_running.exchange(true)) { // avoid running scripts in parallel
+        return;
+    }
+
     signal.clearTerminal();
 
     Interpreter interpreter;
@@ -41,6 +45,8 @@ void VisualizationInterpreter::run_script(const std::string& script) {
     case Interpreter::ExecResult::NOERROR:
         marker.commit();
     }
+
+    is_running.store(false);
 }
 
 void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaParser& parser) {

@@ -49,6 +49,7 @@ public slots:
     void onTextChanged();
     void onRunScriptClicked();
     void updateMarkerInterface() {vis.marker.update();}
+    void updateTf();
 };
 
 }  // namespace rqt_graph_editor

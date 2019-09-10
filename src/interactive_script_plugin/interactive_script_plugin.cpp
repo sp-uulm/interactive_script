@@ -71,6 +71,13 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
     timer->start();
     connect(timer, &QTimer::timeout,
             this,  &InteractiveScriptGui::updateMarkerInterface);
+
+    // recalculate the visualization once per second
+    QTimer* timer2 = new QTimer(this);
+    timer2->setInterval(1000/1.0);
+    timer2->start();
+    connect(timer2, &QTimer::timeout,
+            this,  &InteractiveScriptGui::updateTf);
 }
 
 void InteractiveScriptGui::shutdownPlugin()
@@ -155,6 +162,11 @@ void InteractiveScriptGui::onRunScriptClicked() {
     live.run_script(ui_.editor->toPlainText().toStdString());
 }
 
+void InteractiveScriptGui::updateTf() {
+    if (!eval_paused) {
+        vis.run_script(ui_.editor->toPlainText().toStdString());
+    }
+}
 
 /*bool hasConfiguration() const
 {
