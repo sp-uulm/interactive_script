@@ -51,7 +51,7 @@ struct VisualizationInterpreter {
     MarkerInterface marker;
     TfInterface tf;
     SignalObject signal;
-    std::atomic<bool> is_running;
+    std::atomic<bool> is_running {false};
 
     void run_script(const std::string& script);
     void populate_visualization_env(lua::rt::Environment& env, LuaParser& parser);
