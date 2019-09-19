@@ -97,6 +97,29 @@ void InteractiveScriptGui::restoreSettings(const qt_gui_cpp::Settings& /*plugin_
   // v = instance_settings.value(k)
 }
 
+void InteractiveScriptGui::execute_vis() {
+    string s = ui_.editor->toPlainText().toStdString();
+    vis.run_script(s);
+
+    // set the updated script (TODO: highlighting)
+    eval_paused = true;
+
+    auto old_anchor = ui_.editor->textCursor().anchor();
+    auto old_position = ui_.editor->textCursor().position();
+
+    QTextCursor cursor(ui_.editor->document());
+    cursor.select(QTextCursor::SelectionType::Document);
+    cursor.removeSelectedText();
+    cursor.insertText(QString::fromStdString(s));
+
+    cursor.setPosition(old_anchor);
+    cursor.setPosition(old_position, QTextCursor::KeepAnchor);
+
+    ui_.editor->setTextCursor(cursor);
+
+    eval_paused = false;
+}
+
 void InteractiveScriptGui::onHighlightTokens(TokenMessage tokens) {
     bool old_eval_paused = eval_paused;
     eval_paused = true;
@@ -126,8 +149,9 @@ void InteractiveScriptGui::onHighlightTokens(TokenMessage tokens) {
 
 void InteractiveScriptGui::onPauseEval(bool pause) {
     eval_paused = pause;
-    if (!eval_paused)
-        vis.run_script(ui_.editor->toPlainText().toStdString());
+    if (!eval_paused) {
+        execute_vis();
+    }
 }
 
 void InteractiveScriptGui::onChangeEditorText(QString s) {
@@ -154,7 +178,7 @@ void InteractiveScriptGui::onTextChanged() {
         cursor.setCharFormat(fmt);
         eval_paused = false;
 
-        vis.run_script(ui_.editor->toPlainText().toStdString());
+        execute_vis();
     }
 }
 
@@ -164,7 +188,7 @@ void InteractiveScriptGui::onRunScriptClicked() {
 
 void InteractiveScriptGui::updateTf() {
     if (!eval_paused) {
-        vis.run_script(ui_.editor->toPlainText().toStdString());
+        execute_vis();
     }
 }
 

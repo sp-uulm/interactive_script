@@ -44,7 +44,7 @@ struct Interpreter {
         env->clear();
     }
 
-    std::pair<ExecResult, std::string> dostring(const std::string& program);
+    std::pair<ExecResult, lua::rt::eval_result_t> dostring(const std::string& program);
 };
 
 struct VisualizationInterpreter {
@@ -53,7 +53,7 @@ struct VisualizationInterpreter {
     SignalObject signal;
     std::atomic<bool> is_running {false};
 
-    void run_script(const std::string& script);
+    void run_script(std::string& script);
     void populate_visualization_env(lua::rt::Environment& env, LuaParser& parser);
 };
 

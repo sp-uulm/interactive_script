@@ -10,7 +10,7 @@
 using namespace lua::rt;
 using namespace std;
 
-std::pair<Interpreter::ExecResult, std::string> Interpreter::dostring(const string& program) {
+std::pair<Interpreter::ExecResult, eval_result_t> Interpreter::dostring(const string& program) {
     const auto result = parser.parse(program);
 
     if (holds_alternative<string>(result)) {
@@ -20,13 +20,14 @@ std::pair<Interpreter::ExecResult, std::string> Interpreter::dostring(const stri
 
         lua::rt::ASTEvaluator eval;
         if (auto eval_result = parse_result->accept(eval, env); holds_alternative<string>(eval_result)) {
-            return {ExecResult::ERR_RUNTIME, get<string>(eval_result)};
+            return {ExecResult::ERR_RUNTIME, eval_result};
+        } else {
+            return {ExecResult::NOERROR, eval_result};
         }
-        return {ExecResult::NOERROR, ""};
     }
 }
 
-void VisualizationInterpreter::run_script(const std::string& script) {
+void VisualizationInterpreter::run_script(std::string& script) {
     if (is_running.exchange(true)) { // avoid running scripts in parallel
         return;
     }
@@ -38,12 +39,22 @@ void VisualizationInterpreter::run_script(const std::string& script) {
 
     switch (auto [c, s] = interpreter.dostring(script); c) {
     case Interpreter::ExecResult::ERR_PARSE:
-        signal.appendTerminal(QString::fromStdString(s));
+        signal.appendTerminal(QString::fromStdString(get<string>(s)));
         break;
     case Interpreter::ExecResult::ERR_RUNTIME:
-        signal.appendTerminal(QString::fromStdString(s));
+        signal.appendTerminal(QString::fromStdString(get<string>(s)));
+        break;
     case Interpreter::ExecResult::NOERROR:
+        // apply the source changes
+        auto sc = get_sc(s);
+        if (sc) {
+            auto modified_tokens = (*sc)->apply(interpreter.parser.tokens);
+            // modify the argument string with the source changes
+            script = get_string(interpreter.parser.tokens);
+        }
+
         marker.commit();
+        break;
     }
 
     is_running.store(false);
@@ -325,10 +336,10 @@ void LiveScriptInterpreter::run_script(const std::string& script) {
         populate_live_env(*interpreter.env, cancelled);
         switch (auto [c, s] = interpreter.dostring(script); c) {
         case Interpreter::ExecResult::ERR_PARSE:
-            signal.appendTerminal(QString::fromStdString(s));
+            signal.appendTerminal(QString::fromStdString(get<string>(s)));
             break;
         case Interpreter::ExecResult::ERR_RUNTIME:
-            signal.appendTerminal(QString::fromStdString(s));
+            signal.appendTerminal(QString::fromStdString(get<string>(s)));
             break;
         case Interpreter::ExecResult::NOERROR:
             signal.appendTerminal("Info: Execution finished");
@@ -423,6 +434,9 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
 
             if (auto _p = tf.get_pose(get<string>(args[0]))) {
                 p = *_p;
+            } else {
+                signal.appendTerminal("invalid frame for pose. Is tf connected?");
+                return {nil()};
             }
 
             table_p t = make_shared<table>();
