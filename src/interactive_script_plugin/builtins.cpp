@@ -50,7 +50,7 @@ void VisualizationInterpreter::run_script(std::string& script) {
         if (sc) {
             auto modified_tokens = (*sc)->apply(interpreter.parser.tokens);
             // modify the argument string with the source changes
-            script = get_string(interpreter.parser.tokens);
+            script = get_string(modified_tokens);
         }
 
         marker.commit();
@@ -119,7 +119,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                             // make sure the script is only executed once after all highlights are set
                             signal.pauseEval(true);
                             auto modified_tokens = changes.apply(tokens);
-                            signal.changeEditorText(QString::fromStdString(get_string(tokens)));
+                            signal.changeEditorText(QString::fromStdString(get_string(modified_tokens)));
                             signal.highlightTokens(modified_tokens);
                             signal.pauseEval(false);
                         }
@@ -269,7 +269,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                     // make sure the script is only executed once after all highlights are set
                     signal.pauseEval(true);
                     auto modified_tokens = changes.apply(tokens);
-                    signal.changeEditorText(QString::fromStdString(get_string(tokens)));
+                    signal.changeEditorText(QString::fromStdString(get_string(modified_tokens)));
                     signal.highlightTokens(modified_tokens);
                     signal.pauseEval(false);
                 }
@@ -319,7 +319,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                     // make sure the script is only executed once after all highlights are set
                     signal.pauseEval(true);
                     auto modified_tokens = changes.apply(tokens);
-                    signal.changeEditorText(QString::fromStdString(get_string(tokens)));
+                    signal.changeEditorText(QString::fromStdString(get_string(modified_tokens)));
                     signal.highlightTokens(modified_tokens);
                     signal.pauseEval(false);
                 }
