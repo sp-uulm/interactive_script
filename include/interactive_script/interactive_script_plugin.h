@@ -30,6 +30,7 @@ public:
       const qt_gui_cpp::Settings& instance_settings);
 
     void execute_vis();
+    void removeFormatting();
 
     // Comment in to signal that the plugin has a way to configure it
     // bool hasConfiguration() const;
@@ -44,8 +45,9 @@ private:
     bool eval_paused = false;
 public slots:
     void onChangeEditorText(QString);
+    void onApplySourceChanges(SourceChangeMessage msg, QTextCharFormat fmt);
     void onHighlightTokens(TokenMessage);
-    void onPauseEval(bool);
+    void onRemoveFormatting();
     void onClearTerminal();
     void onAppendTerminal(QString);
     void onTextChanged();

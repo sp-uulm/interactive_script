@@ -35,6 +35,8 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
     ui_.terminal->setStyleSheet("background-color: dimgray; color: white");
 
     qRegisterMetaType<TokenMessage>();
+    qRegisterMetaType<SourceChangeMessage>();
+    qRegisterMetaType<QTextCharFormat>();
 
     connect(ui_.editor, &QPlainTextEdit::textChanged,
             this, &InteractiveScriptGui::onTextChanged);
@@ -44,17 +46,21 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
 
     connect(&vis.signal, &SignalObject::changeEditorText,
             this, &InteractiveScriptGui::onChangeEditorText);
+    connect(&vis.signal, &SignalObject::applySourceChanges,
+            this, &InteractiveScriptGui::onApplySourceChanges);
     connect(&vis.signal, &SignalObject::clearTerminal,
             this, &InteractiveScriptGui::onClearTerminal);
     connect(&vis.signal, &SignalObject::appendTerminal,
             this, &InteractiveScriptGui::onAppendTerminal);
     connect(&vis.signal, &SignalObject::highlightTokens,
             this, &InteractiveScriptGui::onHighlightTokens);
-    connect(&vis.signal, &SignalObject::pauseEval,
-            this, &InteractiveScriptGui::onPauseEval);
+    connect(&vis.signal, &SignalObject::removeFormatting,
+            this, &InteractiveScriptGui::onRemoveFormatting);
 
     connect(&live.signal, &SignalObject::changeEditorText,
             this, &InteractiveScriptGui::onChangeEditorText);
+    connect(&live.signal, &SignalObject::applySourceChanges,
+            this, &InteractiveScriptGui::onApplySourceChanges);
     connect(&live.signal, &SignalObject::clearTerminal,
             this, &InteractiveScriptGui::onClearTerminal);
     connect(&live.signal, &SignalObject::appendTerminal,
@@ -100,42 +106,27 @@ void InteractiveScriptGui::restoreSettings(const qt_gui_cpp::Settings& /*plugin_
 void InteractiveScriptGui::execute_vis() {
     string s = ui_.editor->toPlainText().toStdString();
     vis.run_script(s);
+}
 
-    // set the updated script (TODO: highlighting)
-    eval_paused = true;
-
-    auto old_anchor = ui_.editor->textCursor().anchor();
-    auto old_position = ui_.editor->textCursor().position();
-
+void InteractiveScriptGui::removeFormatting() {
     QTextCursor cursor(ui_.editor->document());
-    cursor.select(QTextCursor::SelectionType::Document);
-    cursor.removeSelectedText();
-    cursor.insertText(QString::fromStdString(s));
-
-    cursor.setPosition(old_anchor);
-    cursor.setPosition(old_position, QTextCursor::KeepAnchor);
-
-    ui_.editor->setTextCursor(cursor);
-
-    eval_paused = false;
+    cursor.select(QTextCursor::Document);
+    cursor.setCharFormat(QTextCharFormat());
 }
 
 void InteractiveScriptGui::onHighlightTokens(TokenMessage tokens) {
     bool old_eval_paused = eval_paused;
     eval_paused = true;
 
-    QTextCharFormat fmt;
-
     QTextCursor cursor(ui_.editor->document());
 
-    // remove previous highlights
-    cursor.setPosition(0, QTextCursor::MoveAnchor);
-    cursor.setPosition(ui_.editor->document()->toPlainText().length(), QTextCursor::KeepAnchor);
-    cursor.setCharFormat(fmt);
+    // remove any formatting
+    removeFormatting();
 
     for (const auto& t : tokens) {
         //cout << "highlight: " << t << endl;
 
+        QTextCharFormat fmt;
         fmt.setBackground(Qt::red);
         fmt.setForeground(Qt::white);
 
@@ -147,15 +138,74 @@ void InteractiveScriptGui::onHighlightTokens(TokenMessage tokens) {
     eval_paused = false;
 }
 
-void InteractiveScriptGui::onPauseEval(bool pause) {
-    eval_paused = pause;
-    if (!eval_paused) {
-        execute_vis();
-    }
+void InteractiveScriptGui::onRemoveFormatting() {
+    // remove any formatting
+    eval_paused = true;
+    removeFormatting();
+    eval_paused = false;
 }
 
 void InteractiveScriptGui::onChangeEditorText(QString s) {
     ui_.editor->setPlainText(s);
+}
+
+struct EditorSCVisitor : lua::rt::SourceChangeVisitor {
+
+    void visit(const lua::rt::SourceChangeOr& sc_or) override {
+        if (!sc_or.alternatives.empty())
+            sc_or.alternatives[0]->accept(*this);
+    }
+
+    void visit(const lua::rt::SourceChangeAnd& sc_and) override {
+        for (const auto& c : sc_and.changes) {
+            c->accept(*this);
+        }
+    }
+
+    void visit(const lua::rt::SourceAssignment& sc) override {
+        changes.push_back(sc);
+    }
+
+    bool apply_changes(QTextCursor& cursor, QTextCharFormat format = QTextCharFormat()) {
+        // sort the collected changes according to their position
+        std::sort(changes.begin(), changes.end(), [](const auto& a, const auto& b){
+            return a.token.pos > b.token.pos;
+        });
+
+        bool changed = false;
+
+        // apply the changes from back to front
+        for (const auto& sc : changes) {
+            cursor.setPosition(sc.token.pos, QTextCursor::MoveAnchor);
+            cursor.setPosition(sc.token.pos + sc.token.length, QTextCursor::KeepAnchor);
+
+            if (QString s = QString::fromStdString(sc.replacement); cursor.selectedText() != s) {
+                cursor.insertText(s, format);
+                changed = true;
+            }
+        }
+
+        // delete list of changes
+        changes.clear();
+
+        return changed;
+    }
+
+    std::vector<lua::rt::SourceAssignment> changes;
+};
+
+void InteractiveScriptGui::onApplySourceChanges(SourceChangeMessage msg, QTextCharFormat fmt) {
+    EditorSCVisitor vis;
+    msg->accept(vis);
+
+    QTextCursor cursor(ui_.editor->document());
+
+    eval_paused = true;
+    bool changed = vis.apply_changes(cursor, fmt);
+    eval_paused = false;
+
+    if (changed)
+        execute_vis();
 }
 
 void InteractiveScriptGui::onClearTerminal() {
@@ -169,13 +219,9 @@ void InteractiveScriptGui::onAppendTerminal(QString s) {
 void InteractiveScriptGui::onTextChanged() {
     if (!eval_paused) {
 
-        // remove all highlights and avoid recursion
+        // remove any formatting
         eval_paused = true;
-        QTextCharFormat fmt;
-        QTextCursor cursor(ui_.editor->document());
-        cursor.setPosition(0, QTextCursor::MoveAnchor);
-        cursor.setPosition(ui_.editor->document()->toPlainText().length(), QTextCursor::KeepAnchor);
-        cursor.setCharFormat(fmt);
+        removeFormatting();
         eval_paused = false;
 
         execute_vis();

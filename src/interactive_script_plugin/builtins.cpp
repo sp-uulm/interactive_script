@@ -48,9 +48,10 @@ void VisualizationInterpreter::run_script(std::string& script) {
         // apply the source changes
         auto sc = get_sc(s);
         if (sc) {
-            auto modified_tokens = (*sc)->apply(interpreter.parser.tokens);
-            // modify the argument string with the source changes
-            script = get_string(modified_tokens);
+            QTextCharFormat fmt;
+            fmt.setBackground(Qt::red);
+            fmt.setForeground(Qt::white);
+            signal.applySourceChanges(*sc, fmt);
         }
 
         marker.commit();
@@ -98,30 +99,30 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                            args[3].source.get(),
                     [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, psi_source = args[3].source, this, tokens = parser.tokens, original_psi = get<double>(args[3])](const auto& feedback) mutable {
                         if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
-                            lua::rt::SourceChangeAnd changes;
+                            auto changes = make_shared<lua::rt::SourceChangeAnd>();
                             if (x_source && feedback->control_name == "move_x") {
                                 if (const auto& change = x_source->forceValue(feedback->pose.position.x))
-                                    changes.changes.push_back(*change);
+                                    changes->changes.push_back(*change);
                             }
                             if (y_source && feedback->control_name == "move_y") {
                                 if (const auto& change = y_source->forceValue(feedback->pose.position.y))
-                                    changes.changes.push_back(*change);
+                                    changes->changes.push_back(*change);
                             }
                             if (z_source && feedback->control_name == "move_z") {
                                 if (const auto& change = z_source->forceValue(feedback->pose.position.z))
-                                    changes.changes.push_back(*change);
+                                    changes->changes.push_back(*change);
                             }
                             if (psi_source && feedback->control_name == "move_psi") {
                                 if (const auto& change = psi_source->forceValue(fmod(yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
-                                    changes.changes.push_back(*change);
+                                    changes->changes.push_back(*change);
                             }
 
-                            // make sure the script is only executed once after all highlights are set
-                            signal.pauseEval(true);
-                            auto modified_tokens = changes.apply(tokens);
-                            signal.changeEditorText(QString::fromStdString(get_string(modified_tokens)));
-                            signal.highlightTokens(modified_tokens);
-                            signal.pauseEval(false);
+                            // apply and highlight changes
+                            signal.removeFormatting();
+                            QTextCharFormat fmt;
+                            fmt.setBackground(Qt::red);
+                            fmt.setForeground(Qt::white);
+                            signal.applySourceChanges(changes, fmt);
                         }
                     });
 
@@ -252,26 +253,26 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                                     args[0].source.get(), args[1].source.get(), args[2].source.get(),
             [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, this, tokens = parser.tokens](const auto& feedback) mutable {
                 if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
-                    lua::rt::SourceChangeAnd changes;
+                    auto changes = make_shared<lua::rt::SourceChangeAnd>();
                     if (x_source && feedback->control_name == "move_x") {
                         if (const auto& change = x_source->forceValue(feedback->pose.position.x))
-                            changes.changes.push_back(*change);
+                            changes->changes.push_back(*change);
                     }
                     if (y_source && feedback->control_name == "move_y") {
                         if (const auto& change = y_source->forceValue(feedback->pose.position.y))
-                            changes.changes.push_back(*change);
+                            changes->changes.push_back(*change);
                     }
                     if (z_source && feedback->control_name == "move_z") {
                         if (const auto& change = z_source->forceValue(feedback->pose.position.z))
-                            changes.changes.push_back(*change);
+                            changes->changes.push_back(*change);
                     }
 
-                    // make sure the script is only executed once after all highlights are set
-                    signal.pauseEval(true);
-                    auto modified_tokens = changes.apply(tokens);
-                    signal.changeEditorText(QString::fromStdString(get_string(modified_tokens)));
-                    signal.highlightTokens(modified_tokens);
-                    signal.pauseEval(false);
+                    // apply and highlight changes
+                    signal.removeFormatting();
+                    QTextCharFormat fmt;
+                    fmt.setBackground(Qt::red);
+                    fmt.setForeground(Qt::white);
+                    signal.applySourceChanges(changes, fmt);
                 }
             });
         return {};
@@ -298,30 +299,30 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                                     args[0].source.get(), args[1].source.get(), args[2].source.get(), args[3].source.get(),
             [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, psi_source = args[3].source, this, tokens = parser.tokens, original_psi = get<double>(args[3])](const auto& feedback) mutable {
                 if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
-                    lua::rt::SourceChangeAnd changes;
+                    auto changes = make_shared<lua::rt::SourceChangeAnd>();
                     if (x_source && feedback->control_name == "move_x") {
                         if (const auto& change = x_source->forceValue(feedback->pose.position.x))
-                            changes.changes.push_back(*change);
+                            changes->changes.push_back(*change);
                     }
                     if (y_source && feedback->control_name == "move_y") {
                         if (const auto& change = y_source->forceValue(feedback->pose.position.y))
-                            changes.changes.push_back(*change);
+                            changes->changes.push_back(*change);
                     }
                     if (z_source && feedback->control_name == "move_z") {
                         if (const auto& change = z_source->forceValue(feedback->pose.position.z))
-                            changes.changes.push_back(*change);
+                            changes->changes.push_back(*change);
                     }
                     if (psi_source && feedback->control_name == "move_psi") {
                         if (const auto& change = psi_source->forceValue(fmod(yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
-                            changes.changes.push_back(*change);
+                            changes->changes.push_back(*change);
                     }
 
-                    // make sure the script is only executed once after all highlights are set
-                    signal.pauseEval(true);
-                    auto modified_tokens = changes.apply(tokens);
-                    signal.changeEditorText(QString::fromStdString(get_string(modified_tokens)));
-                    signal.highlightTokens(modified_tokens);
-                    signal.pauseEval(false);
+                    // apply and highlight changes
+                    signal.removeFormatting();
+                    QTextCharFormat fmt;
+                    fmt.setBackground(Qt::red);
+                    fmt.setForeground(Qt::white);
+                    signal.applySourceChanges(changes, fmt);
                 }
             });
         return {};
