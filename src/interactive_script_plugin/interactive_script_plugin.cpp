@@ -149,23 +149,7 @@ void InteractiveScriptGui::onChangeEditorText(QString s) {
     ui_.editor->setPlainText(s);
 }
 
-struct EditorSCVisitor : lua::rt::SourceChangeVisitor {
-
-    void visit(const lua::rt::SourceChangeOr& sc_or) override {
-        if (!sc_or.alternatives.empty())
-            sc_or.alternatives[0]->accept(*this);
-    }
-
-    void visit(const lua::rt::SourceChangeAnd& sc_and) override {
-        for (const auto& c : sc_and.changes) {
-            c->accept(*this);
-        }
-    }
-
-    void visit(const lua::rt::SourceAssignment& sc) override {
-        changes.push_back(sc);
-    }
-
+struct EditorSCVisitor : lua::rt::ApplySCVisitor {
     bool apply_changes(QTextCursor& cursor, QTextCharFormat format = QTextCharFormat()) {
         // sort the collected changes according to their position
         std::sort(changes.begin(), changes.end(), [](const auto& a, const auto& b){
@@ -190,8 +174,6 @@ struct EditorSCVisitor : lua::rt::SourceChangeVisitor {
 
         return changed;
     }
-
-    std::vector<lua::rt::SourceAssignment> changes;
 };
 
 void InteractiveScriptGui::onApplySourceChanges(SourceChangeMessage msg, QTextCharFormat fmt) {
