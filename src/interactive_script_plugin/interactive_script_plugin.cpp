@@ -88,6 +88,7 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
 
 void InteractiveScriptGui::shutdownPlugin()
 {
+  is_shutdown = true;
   // unregister all publishers here
 }
 
@@ -104,8 +105,10 @@ void InteractiveScriptGui::restoreSettings(const qt_gui_cpp::Settings& /*plugin_
 }
 
 void InteractiveScriptGui::execute_vis() {
-    string s = ui_.editor->toPlainText().toStdString();
-    vis.run_script(s);
+    if (!is_shutdown) {
+        string s = ui_.editor->toPlainText().toStdString();
+        vis.run_script(s);
+    }
 }
 
 void InteractiveScriptGui::removeFormatting() {
@@ -206,7 +209,7 @@ void InteractiveScriptGui::onTextChanged() {
         removeFormatting();
         eval_paused = false;
 
-        execute_vis();
+//        execute_vis();
     }
 }
 

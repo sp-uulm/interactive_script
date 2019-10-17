@@ -46,6 +46,7 @@ private:
     LiveScriptInterpreter live;
 
     bool eval_paused = false;
+    bool is_shutdown = false;
 public slots:
     void onChangeEditorText(QString);
     void onApplySourceChanges(SourceChangeMessage msg, QTextCharFormat fmt);
