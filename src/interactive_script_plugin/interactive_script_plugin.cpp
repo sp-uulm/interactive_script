@@ -80,7 +80,7 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
 
     // recalculate the visualization once per second
     QTimer* timer2 = new QTimer(this);
-    timer2->setInterval(1000/1.0);
+    timer2->setInterval(1000/15.0);
     timer2->start();
     connect(timer2, &QTimer::timeout,
             this,  &InteractiveScriptGui::updateTf);
@@ -217,6 +217,16 @@ void InteractiveScriptGui::onRunScriptClicked() {
 void InteractiveScriptGui::updateTf() {
     if (!eval_paused) {
         execute_vis();
+    }
+
+    if (setting_print_performance_statistics) {
+        ROS_INFO_STREAM_THROTTLE(1, "Total time [us]: " << vis.ps.total.count() << endl
+                                 << "- tokenize [us]: " << vis.ps.tokenize.count() << endl
+                                 << "- parse    [us]: " << vis.ps.parse.count() << endl
+                                 << "- lib/env  [us]: " << vis.ps.create_env.count() << endl
+                                 << "- execute  [us]: " << (vis.ps.execute-vis.ps.marker_interface).count() << endl
+                                 << "- marker   [us]: " << vis.ps.marker_interface.count() << endl
+                                 << "- apply sc [us]: " << vis.ps.source_changes.count() << endl);
     }
 }
 

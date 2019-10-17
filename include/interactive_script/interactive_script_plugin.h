@@ -7,6 +7,7 @@
 #include "luaparser.h"
 #include "luainterpreter.h"
 #include <rqt_gui_cpp/plugin.h>
+#include <ros/console.h>
 #include <ui_interactive_script_plugin.h>
 #include <QWidget>
 #include <memory>
@@ -37,6 +38,8 @@ public:
     // void triggerConfiguration();
     Ui::InteractiveScriptWidget ui_;
 private:
+    bool setting_print_performance_statistics = true;
+
     QWidget* widget_ = nullptr;
 
     VisualizationInterpreter vis;

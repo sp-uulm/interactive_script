@@ -5,14 +5,20 @@ void MarkerInterface::update() {
 }
 
 void MarkerInterface::commit() {
+    auto start = std::chrono::steady_clock::now();
     server.applyChanges();
     server.clear();
     n = 0;
+    auto end = std::chrono::steady_clock::now();
+    runtime += (end-start);
 }
 
 void MarkerInterface::addPoint(double x, double y, double z,
                                bool free_x, bool free_y, bool free_z,
                                interactive_markers::InteractiveMarkerServer::FeedbackCallback func) {
+
+    auto start = std::chrono::steady_clock::now();
+
     // create an interactive marker for our server
     visualization_msgs::InteractiveMarker int_marker;
     int_marker.header.frame_id = WORLD_FRAME;
@@ -97,9 +103,14 @@ void MarkerInterface::addPoint(double x, double y, double z,
     // add the interactive marker to our collection &
     // tell the server to call processFeedback() when feedback arrives for it
     server.insert(int_marker, func);
+
+    auto end = std::chrono::steady_clock::now();
+    runtime += (end-start);
 }
 
 void MarkerInterface::addLine(double x, double y, double z, double x2, double y2, double z2, Color color, double width) {
+    auto start = std::chrono::steady_clock::now();
+
     // create an interactive marker for our server
     visualization_msgs::InteractiveMarker int_marker;
     int_marker.header.frame_id = WORLD_FRAME;
@@ -156,11 +167,16 @@ void MarkerInterface::addLine(double x, double y, double z, double x2, double y2
               << feedback->pose.position.x << ", " << feedback->pose.position.y
               << ", " << feedback->pose.position.z );
     });
+
+    auto end = std::chrono::steady_clock::now();
+    runtime += (end-start);
 }
 
 void MarkerInterface::addPose(double x, double y, double z, double psi,
                                bool free_x, bool free_y, bool free_z, bool free_psi,
                                interactive_markers::InteractiveMarkerServer::FeedbackCallback func) {
+    auto start = std::chrono::steady_clock::now();
+
     // create an interactive marker for our server
     visualization_msgs::InteractiveMarker int_marker;
     int_marker.header.frame_id = WORLD_FRAME;
@@ -277,4 +293,6 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     // add the interactive marker to our collection &
     // tell the server to call processFeedback() when feedback arrives for it
     server.insert(int_marker, func);
+    auto end = std::chrono::steady_clock::now();
+    runtime += (end-start);
 }

@@ -10,8 +10,9 @@
 using namespace lua::rt;
 using namespace std;
 
-std::pair<Interpreter::ExecResult, eval_result_t> Interpreter::dostring(const string& program) {
-    const auto result = parser.parse(program);
+std::pair<Interpreter::ExecResult, eval_result_t> Interpreter::dostring(const string& program, PerformanceStatistics& ps) {
+    const auto result = parser.parse(program, ps);
+    auto parse_end = chrono::steady_clock::now();
 
     if (holds_alternative<string>(result)) {
         return {ExecResult::ERR_PARSE, get<string>(result)};
@@ -22,6 +23,8 @@ std::pair<Interpreter::ExecResult, eval_result_t> Interpreter::dostring(const st
         if (auto eval_result = parse_result->accept(eval, env); holds_alternative<string>(eval_result)) {
             return {ExecResult::ERR_RUNTIME, eval_result};
         } else {
+            auto eval_end = chrono::steady_clock::now();
+            ps.execute = chrono::duration_cast<chrono::microseconds>(eval_end - parse_end);
             return {ExecResult::NOERROR, eval_result};
         }
     }
@@ -33,11 +36,14 @@ void VisualizationInterpreter::run_script(std::string& script) {
     }
 
     signal.clearTerminal();
+    marker.runtime = chrono::duration<double>();
 
-    Interpreter interpreter;
+    auto exec_start = chrono::steady_clock::now();
+    Interpreter interpreter {parser};
     populate_visualization_env(*interpreter.env, interpreter.parser);
+    auto exec_ready = chrono::steady_clock::now();
 
-    switch (auto [c, s] = interpreter.dostring(script); c) {
+    switch (auto [c, s] = interpreter.dostring(script, ps); c) {
     case Interpreter::ExecResult::ERR_PARSE:
         signal.appendTerminal(QString::fromStdString(get<string>(s)));
         break;
@@ -45,17 +51,27 @@ void VisualizationInterpreter::run_script(std::string& script) {
         signal.appendTerminal(QString::fromStdString(get<string>(s)));
         break;
     case Interpreter::ExecResult::NOERROR:
-        // apply the source changes
-        auto sc = get_sc(s);
-        if (sc) {
-            QTextCharFormat fmt;
-            fmt.setBackground(Qt::red);
-            fmt.setForeground(Qt::white);
-            signal.applySourceChanges(*sc, fmt);
-        }
+        {
+            // apply the source changes
+            auto exec_end = chrono::steady_clock::now();
+            auto sc = get_sc(s);
+            if (sc) {
+                QTextCharFormat fmt;
+                fmt.setBackground(Qt::red);
+                fmt.setForeground(Qt::white);
+                signal.applySourceChanges(*sc, fmt);
+            }
 
-        marker.commit();
-        break;
+            marker.commit();
+
+            auto sc_end = chrono::steady_clock::now();
+
+            ps.total = chrono::duration_cast<chrono::microseconds>(sc_end - exec_start);
+            ps.create_env = chrono::duration_cast<chrono::microseconds>(exec_ready - exec_start);
+            ps.marker_interface = chrono::duration_cast<chrono::microseconds>(marker.runtime);
+            ps.source_changes = chrono::duration_cast<chrono::microseconds>(sc_end - exec_end);
+            break;
+        }
     }
 
     is_running.store(false);
@@ -331,11 +347,12 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
 
 void LiveScriptInterpreter::run_script(const std::string& script) {
     async = Async([this, script](const Async::cancel_t& cancelled){
-        Interpreter interpreter;
+        Interpreter interpreter {parser};
 
         signal.clearTerminal();
         populate_live_env(*interpreter.env, cancelled);
-        switch (auto [c, s] = interpreter.dostring(script); c) {
+        PerformanceStatistics ps;
+        switch (auto [c, s] = interpreter.dostring(script, ps); c) {
         case Interpreter::ExecResult::ERR_PARSE:
             signal.appendTerminal(QString::fromStdString(get<string>(s)));
             break;

@@ -9,6 +9,7 @@
 #include <quad_common_utils/async.h>
 #include <ui_interactive_script_plugin.h>
 #include <QWidget>
+#include <chrono>
 
 using Gui = Ui::InteractiveScriptWidget;
 
@@ -38,10 +39,10 @@ signals:
 struct Interpreter {
     enum class ExecResult {NOERROR, ERR_PARSE, ERR_RUNTIME};
 
-    LuaParser parser;
+    LuaParser& parser;
     std::shared_ptr<lua::rt::Environment> env = std::make_shared<lua::rt::Environment>(nullptr);
 
-    Interpreter() {
+    Interpreter(LuaParser& parser) : parser(parser) {
         env->populate_stdlib();
     }
 
@@ -49,7 +50,7 @@ struct Interpreter {
         env->clear();
     }
 
-    std::pair<ExecResult, lua::rt::eval_result_t> dostring(const std::string& program);
+    std::pair<ExecResult, lua::rt::eval_result_t> dostring(const std::string& program, PerformanceStatistics& ps);
 };
 
 struct VisualizationInterpreter {
@@ -57,6 +58,8 @@ struct VisualizationInterpreter {
     TfInterface tf;
     SignalObject signal;
     std::atomic<bool> is_running {false};
+    LuaParser parser;
+    PerformanceStatistics ps;
 
     void run_script(std::string& script);
     void populate_visualization_env(lua::rt::Environment& env, LuaParser& parser);
@@ -69,6 +72,7 @@ struct LiveScriptInterpreter {
     TfInterface tf;
     Async async;
     SignalObject signal;
+    LuaParser parser;
 
     void run_script(const std::string& script);
     void populate_live_env(lua::rt::Environment& env, const Async::cancel_t& cancelled);

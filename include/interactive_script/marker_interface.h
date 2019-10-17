@@ -6,6 +6,7 @@
 #include <ros/ros.h>
 #include <string>
 #include <functional>
+#include <chrono>
 
 class MarkerInterface {
 private:
@@ -35,6 +36,7 @@ public:
                   bool free_x = false, bool free_y = false, bool free_z = false, bool free_psi = false,
                   interactive_markers::InteractiveMarkerServer::FeedbackCallback func = [](const auto&){});
 
+    std::chrono::duration<double> runtime = std::chrono::duration<double>();
 };
 
 #endif // MARKER_INTERFACE_H
