@@ -46,6 +46,7 @@
      <property name="font">
       <font>
        <family>Monospace</family>
+       <pointsize>20</pointsize>
       </font>
      </property>
      <property name="plainText">
@@ -64,6 +65,7 @@
      <property name="font">
       <font>
        <family>Monospace</family>
+       <pointsize>20</pointsize>
       </font>
      </property>
      <property name="readOnly">
