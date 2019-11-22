@@ -68,9 +68,15 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
     connect(&live.signal, &SignalObject::highlightTokens,
             this, &InteractiveScriptGui::onHighlightTokens);
 
+    if(!connect(&vis.signal, &SignalObject::setBlockValue,
+                ui_.blockly_widget, &BlocklyWidget::setBlockValue))
+        ROS_ERROR("could not connect signal setBlockValue");
 
     setlocale(LC_ALL, "C");
     onTextChanged();
+
+    // set the editor into which the blockly widget writes the generated code
+    ui_.blockly_widget->setEditor(ui_.editor);
 
     QTimer* timer = new QTimer(this);
     timer->setInterval(1000/60.0);

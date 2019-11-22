@@ -257,6 +257,47 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         return {nil()};
     }), false);
 
+    env.assign("blockValue", make_shared<cfunction>([this, &env](const vallist& args) mutable -> cfunction::result {
+        if (args.size() != 3 || !args[0].isstring() || !args[1].isstring()) {
+            signal.appendTerminal("invalid args to blockValue(id, field, val)");
+            return {nil()};
+        }
+
+        val result = args[2];
+
+        // set source
+        struct block_val : sourceexp {
+            block_val(SignalObject& signal, const string& id, const string& field) : signal(signal), id(id), field(field) {}
+
+            optional<shared_ptr<SourceChange>> forceValue(const val& newval) const override{
+                // TODO: unsauber, SourceChangeBlock als return!
+                signal.setBlockValue(QString::fromStdString(id),
+                                     QString::fromStdString(field),
+                                     QString::fromStdString(newval.to_string()));
+
+                return nullopt;
+            }
+
+            eval_result_t reevaluate() override {
+                return string{"not implemented"};
+            }
+
+            bool isDirty() const override {
+                return false;
+            }
+
+            SignalObject& signal;
+            string id;
+            string field;
+        };
+
+        result.source = std::make_shared<block_val>(signal,
+                                                    get<string>(args[0]),
+                                                    get<string>(args[1]));
+
+        return {result};
+    }), false);
+
     auto rviz = make_shared<table>();
     env.assign("rviz", rviz, false);
 

@@ -12,6 +12,7 @@
 #include <QWidget>
 #include <memory>
 #include <interactive_script/builtins.h>
+#include <interactive_script/blocklybridge.h>
 
 namespace interactive_script_plugin
 {

@@ -34,6 +34,7 @@ signals:
     void appendTerminal(QString);
     void highlightTokens(TokenMessage);
     void removeFormatting();
+    void setBlockValue(QString, QString, QString);
 };
 
 struct Interpreter {

@@ -20,7 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets WebEngineWidgets REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -125,6 +125,8 @@ set(interactive_script_plugin_SRCS
     src/interactive_script_plugin/quad_interface.cpp
     src/interactive_script_plugin/tf_interface.cpp
     src/interactive_script_plugin/builtins.cpp
+    src/interactive_script_plugin/blocklybridge.cpp
+    src/interactive_script_plugin/blocklywidget.cpp
 )
 
 set(interactive_script_plugin_HDRS
@@ -133,6 +135,8 @@ set(interactive_script_plugin_HDRS
     include/interactive_script/quad_interface.h
     include/interactive_script/tf_interface.h
     include/interactive_script/builtins.h
+    include/interactive_script/blocklybridge.h
+    include/interactive_script/blocklywidget.h
 )
 
 set(interactive_script_plugin_UIS
@@ -195,7 +199,7 @@ add_library(${PROJECT_NAME}
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}
    ${catkin_LIBRARIES}
-   Qt5::Widgets Qt5::Core
+   Qt5::Widgets Qt5::Core Qt5::WebEngineWidgets
    MiniLua
 )
 

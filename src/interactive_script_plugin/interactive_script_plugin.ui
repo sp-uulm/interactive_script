@@ -42,16 +42,40 @@
     </layout>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="editor">
-     <property name="font">
-      <font>
-       <family>Monospace</family>
-       <pointsize>20</pointsize>
-      </font>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>1</number>
      </property>
-     <property name="plainText">
-      <string>print('hello world')</string>
-     </property>
+     <widget class="QWidget" name="code_tab">
+      <attribute name="title">
+       <string>Code</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QPlainTextEdit" name="editor">
+         <property name="font">
+          <font>
+           <family>Monospace</family>
+           <pointsize>20</pointsize>
+          </font>
+         </property>
+         <property name="plainText">
+          <string>print('hello world')</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="blockly_tab">
+      <attribute name="title">
+       <string>Blockly</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="BlocklyWidget" name="blockly_widget" native="true"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -75,6 +99,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>BlocklyWidget</class>
+   <extends>QWidget</extends>
+   <header>interactive_script/blocklywidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -4,6 +4,8 @@ include/interactive_script/interactive_script_plugin.h
 include/interactive_script/marker_interface.h
 include/interactive_script/quad_interface.h
 include/interactive_script/tf_interface.h
+include/interactive_script/blocklybridge.h
+include/interactive_script/blocklywidget.h
 package.xml
 plugin.xml
 setup.py
@@ -13,3 +15,5 @@ src/interactive_script_plugin/interactive_script_plugin.ui
 src/interactive_script_plugin/marker_interface.cpp
 src/interactive_script_plugin/quad_interface.cpp
 src/interactive_script_plugin/tf_interface.cpp
+src/interactive_script_plugin/blocklybridge.cpp
+src/interactive_script_plugin/blocklywidget.cpp
