@@ -21,12 +21,12 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 find_package(Qt5 COMPONENTS Core Widgets WebEngineWidgets REQUIRED)
-
+find_package(MiniLua REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-catkin_python_setup()
+# catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -112,7 +112,7 @@ catkin_package(
 #  INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS roscpp rqt_gui_cpp
-#  DEPENDS system_lib
+#  DEPENDS MiniLua
 )
 
 ###########
@@ -146,28 +146,17 @@ set(interactive_script_plugin_UIS
 qt5_wrap_cpp(interactive_script_plugin_MOCS ${interactive_script_plugin_HDRS})
 qt5_wrap_ui(interactive_script_plugin_UIS_H ${interactive_script_plugin_UIS})
 
-include(ExternalProject)
-
-
-ExternalProject_Add(minilua
-    PREFIX "minilua"
-    SOURCE_DIR ${interactive_script_SOURCE_DIR}/MiniLua
-    INSTALL_DIR ${CATKIN_DEVEL_PREFIX}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CATKIN_DEVEL_PREFIX}
-    BUILD_ALWAYS true
-)
-add_library(MiniLua SHARED IMPORTED)
-set_target_properties(MiniLua PROPERTIES
-  IMPORTED_LOCATION "${CATKIN_DEVEL_PREFIX}/lib/libMiniLua.so")
-
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
   include
-  ${CMAKE_CURRENT_BINARY_DIR}/..
-  MiniLua/include
   ${catkin_INCLUDE_DIRS}
 )
+
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+foreach(dir ${dirs})
+  message(STATUS "dir='${dir}'")
+endforeach()
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
@@ -220,18 +209,16 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS ${PROJECT_NAME}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
@@ -239,6 +226,11 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
+
+install(FILES
+  plugin.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##

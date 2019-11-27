@@ -1,4 +1,4 @@
-<library path="lib/libinteractive_script">
+<library path="libinteractive_script/lib/libinteractive_script">
   <class name="interactive_script_plugin/InteractiveScriptGui" type="interactive_script_plugin::InteractiveScriptGui" base_class_type="rqt_gui_cpp::Plugin">
     <description>
       An example C++ GUI plugin to create a great user interface.

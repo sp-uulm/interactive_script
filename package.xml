@@ -56,6 +56,7 @@
   <depend>quad_common_utils</depend>
   <depend>actionlib</depend>
   <depend>hector_uav_msgs</depend>
+  <depend>MiniLua</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
 
