@@ -1,0 +1,28 @@
+build:
+ stage: build
+ script:
+   - source /opt/ros/melodic/setup.bash
+   
+   - mkdir -p ros_ws/src
+   - cd ros_ws/src
+   - git clone git@spgit.informatik.uni-ulm.de:quadrocopter/quad_common_utils.git
+   - git clone git@spgit.informatik.uni-ulm.de:quadrocopter/hector_quadrotor.git
+   - git clone https://github.com/sp-uulm/MiniLua.git
+   - cd ../..
+   
+   - rm -f ros_ws/src/interactive_script || true
+   - ln -s $(pwd) ros_ws/src/interactive_script
+   
+   - cd ros_ws
+   - rm -rf build install log
+   - colcon build --packages-up-to interactive_script
+   - source install/local_setup.bash
+ artifacts:
+    paths:
+        - ros_ws/install
+   
+tests:
+ stage: test
+ script:
+   - source ros_ws/install/local_setup.bash
+   - rqt --list-plugins --force-discover | grep -q interactive_script
