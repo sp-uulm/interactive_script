@@ -24,5 +24,6 @@ build:
 tests:
  stage: test
  script:
+   - source /opt/ros/melodic/setup.bash
    - source ros_ws/install/local_setup.bash
    - rqt --list-plugins --force-discover | grep -q interactive_script
