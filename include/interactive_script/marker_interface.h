@@ -12,7 +12,7 @@ class MarkerInterface {
 private:
     static constexpr auto WORLD_FRAME = "world";
 
-    ros::NodeHandle nh;
+    std::shared_ptr<rclcpp::Node> node;
     interactive_markers::InteractiveMarkerServer server;
     int n = 0;
 
@@ -21,7 +21,7 @@ public:
         WHITE, RED
     };
 
-    MarkerInterface() : server("simple_marker") {
+    MarkerInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node), server("simple_marker") {
     }
 
     void commit();

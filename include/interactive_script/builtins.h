@@ -10,6 +10,7 @@
 #include <ui_interactive_script_plugin.h>
 #include <QWidget>
 #include <chrono>
+#include <rclcpp/rclcpp.hpp>
 
 using Gui = Ui::InteractiveScriptWidget;
 
@@ -55,6 +56,8 @@ struct Interpreter {
 };
 
 struct VisualizationInterpreter {
+    VisualizationInterpreter(const std::shared_ptr<rclcpp::Node>& node) : marker(node), tf(node) {}
+
     MarkerInterface marker;
     TfInterface tf;
     SignalObject signal;
@@ -67,7 +70,7 @@ struct VisualizationInterpreter {
 };
 
 struct LiveScriptInterpreter {
-    LiveScriptInterpreter() {}
+    LiveScriptInterpreter(const std::shared_ptr<rclcpp::Node>& node) : quad(node), tf(node) {}
 
     QuadcopterInterface quad;
     TfInterface tf;

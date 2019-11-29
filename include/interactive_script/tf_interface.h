@@ -12,12 +12,12 @@ class TfInterface {
 private:
     static constexpr auto WORLD_FRAME = "world";
 
-    ros::NodeHandle nh;
+    std::shared_ptr<rclcpp::Node> node;
     tf2_ros::Buffer tf_buffer;
     tf2_ros::TransformListener tf_listener;
 
 public:
-    TfInterface() : tf_listener(tf_buffer) {
+    TfInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node), tf_listener(tf_buffer) {
     }
 
     std::optional<geometry_msgs::Pose> get_pose(const std::string& object);
