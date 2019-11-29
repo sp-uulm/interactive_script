@@ -1,9 +1,9 @@
 #ifndef QUAD_INTERFACE_H
 #define QUAD_INTERFACE_H
 
-#include <actionlib/client/simple_action_client.h>
-#include <hector_uav_msgs/PoseAction.h>
-#include <ros/ros.h>
+//#include <actionlib/client/simple_action_client.h>
+#include <sp_trajectory_msgs/action/pose.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <quad_common_utils/geometry_msg_helper.h>
 
 struct QuadcopterInterface {

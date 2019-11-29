@@ -7,7 +7,7 @@
 #include "luaparser.h"
 #include "luainterpreter.h"
 #include <rqt_gui_cpp/plugin.h>
-#include <ros/console.h>
+#include <rclcpp/rclcpp.hpp>
 #include <ui_interactive_script_plugin.h>
 #include <QWidget>
 #include <memory>

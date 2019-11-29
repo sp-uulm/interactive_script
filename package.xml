@@ -48,17 +48,16 @@
   <!--   <test_depend>gtest</test_depend> -->
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
-  <buildtool_depend>catkin</buildtool_depend>
-  <depend>roscpp</depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend>
   <depend>rqt_gui</depend>
   <depend>rqt_gui_cpp</depend>
   <depend>interactive_markers</depend>
   <depend>quad_common_utils</depend>
-  <depend>actionlib</depend>
-  <depend>hector_uav_msgs</depend>
   <depend>MiniLua</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
+  <depend>sp_trajectory_msgs</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
