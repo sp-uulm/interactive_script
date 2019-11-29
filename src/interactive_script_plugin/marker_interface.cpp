@@ -1,7 +1,7 @@
 #include <interactive_script/marker_interface.h>
 
 void MarkerInterface::update() {
-    ros::spinOnce();
+    //ros::spinOnce();
 }
 
 void MarkerInterface::commit() {
@@ -20,15 +20,15 @@ void MarkerInterface::addPoint(double x, double y, double z,
     auto start = std::chrono::steady_clock::now();
 
     // create an interactive marker for our server
-    visualization_msgs::InteractiveMarker int_marker;
+    visualization_msgs::msg::InteractiveMarker int_marker;
     int_marker.header.frame_id = WORLD_FRAME;
-    int_marker.header.stamp=ros::Time::now();
+    int_marker.header.stamp=node->now();
     int_marker.name = "point_marker_" + std::to_string(n++);
     //int_marker.description = "Simple 1-DOF Control";
 
     // create a grey box marker
-    visualization_msgs::Marker box_marker;
-    box_marker.type = visualization_msgs::Marker::SPHERE;
+    visualization_msgs::msg::Marker box_marker;
+    box_marker.type = visualization_msgs::msg::Marker::SPHERE;
     box_marker.scale.x = 0.25;
     box_marker.scale.y = 0.25;
     box_marker.scale.z = 0.25;
@@ -42,7 +42,7 @@ void MarkerInterface::addPoint(double x, double y, double z,
     int_marker.pose.position.z = z;
 
     // create a non-interactive control which contains the box
-    visualization_msgs::InteractiveMarkerControl box_control;
+    visualization_msgs::msg::InteractiveMarkerControl box_control;
     box_control.always_visible = true;
     box_control.markers.push_back( box_marker );
 
@@ -53,14 +53,14 @@ void MarkerInterface::addPoint(double x, double y, double z,
         // create a control which will move the box
         // this control does not contain any markers,
         // which will cause RViz to insert two arrows
-        visualization_msgs::InteractiveMarkerControl control;
+        visualization_msgs::msg::InteractiveMarkerControl control;
         control.name = "move_x";
         control.orientation.w = 1;
         control.orientation.x = 1;
         control.orientation.y = 0;
         control.orientation.z = 0;
         control.interaction_mode =
-          visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+          visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
 
         // add the control to the interactive marker
         int_marker.controls.push_back(control);
@@ -70,14 +70,14 @@ void MarkerInterface::addPoint(double x, double y, double z,
         // create a control which will move the box
         // this control does not contain any markers,
         // which will cause RViz to insert two arrows
-        visualization_msgs::InteractiveMarkerControl control;
+        visualization_msgs::msg::InteractiveMarkerControl control;
         control.name = "move_y";
         control.orientation.w = 1;
         control.orientation.x = 0;
         control.orientation.y = 0;
         control.orientation.z = 1;
         control.interaction_mode =
-          visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+          visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
 
         // add the control to the interactive marker
         int_marker.controls.push_back(control);
@@ -87,14 +87,14 @@ void MarkerInterface::addPoint(double x, double y, double z,
         // create a control which will move the box
         // this control does not contain any markers,
         // which will cause RViz to insert two arrows
-        visualization_msgs::InteractiveMarkerControl control;
+        visualization_msgs::msg::InteractiveMarkerControl control;
         control.name = "move_z";
         control.orientation.w = 1;
         control.orientation.x = 0;
         control.orientation.y = 1;
         control.orientation.z = 0;
         control.interaction_mode =
-          visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+          visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
 
         // add the control to the interactive marker
         int_marker.controls.push_back(control);
@@ -112,15 +112,15 @@ void MarkerInterface::addLine(double x, double y, double z, double x2, double y2
     auto start = std::chrono::steady_clock::now();
 
     // create an interactive marker for our server
-    visualization_msgs::InteractiveMarker int_marker;
+    visualization_msgs::msg::InteractiveMarker int_marker;
     int_marker.header.frame_id = WORLD_FRAME;
-    int_marker.header.stamp=ros::Time::now();
+    int_marker.header.stamp=node->now();
     int_marker.name = "line_marker_" + std::to_string(n++);
     //int_marker.description = "Simple 1-DOF Control";
 
     // create a grey box marker
-    visualization_msgs::Marker box_marker;
-    box_marker.type = visualization_msgs::Marker::ARROW;
+    visualization_msgs::msg::Marker box_marker;
+    box_marker.type = visualization_msgs::msg::Marker::ARROW;
     box_marker.scale.x = width;
     box_marker.scale.y = width*1.5;
     box_marker.scale.z = width*5;
@@ -153,7 +153,7 @@ void MarkerInterface::addLine(double x, double y, double z, double x2, double y2
     box_marker.points.push_back(p2);
 
     // create a non-interactive control which contains the box
-    visualization_msgs::InteractiveMarkerControl box_control;
+    visualization_msgs::msg::InteractiveMarkerControl box_control;
     box_control.always_visible = true;
     box_control.markers.push_back( box_marker );
 
@@ -162,8 +162,8 @@ void MarkerInterface::addLine(double x, double y, double z, double x2, double y2
 
     // add the interactive marker to our collection &
     // tell the server to call processFeedback() when feedback arrives for it
-    server.insert(int_marker, [](const auto& feedback) {
-        ROS_INFO_STREAM( feedback->marker_name << " is now at "
+    server.insert(int_marker, [this](const auto& feedback) {
+        RCLCPP_INFO_STREAM(node->get_logger(), feedback->marker_name << " is now at "
               << feedback->pose.position.x << ", " << feedback->pose.position.y
               << ", " << feedback->pose.position.z );
     });
@@ -178,9 +178,9 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     auto start = std::chrono::steady_clock::now();
 
     // create an interactive marker for our server
-    visualization_msgs::InteractiveMarker int_marker;
+    visualization_msgs::msg::InteractiveMarker int_marker;
     int_marker.header.frame_id = WORLD_FRAME;
-    int_marker.header.stamp=ros::Time::now();
+    int_marker.header.stamp=node->now();
     int_marker.name = "pose_marker_" + std::to_string(n++);
     //int_marker.description = "Simple 1-DOF Control";
 
@@ -190,8 +190,8 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     int_marker.pose.orientation = geometry_msgs::quaternion();
 
     // create a grey box marker
-    visualization_msgs::Marker box_marker;
-    box_marker.type = visualization_msgs::Marker::CUBE;
+    visualization_msgs::msg::Marker box_marker;
+    box_marker.type = visualization_msgs::msg::Marker::CUBE;
     box_marker.scale.x = 0.3;
     box_marker.scale.y = 0.3;
     box_marker.scale.z = 0.3;
@@ -201,8 +201,8 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     box_marker.color.a = 1.0;
     box_marker.pose.orientation = geometry_msgs::quaternion(0,0,psi);
 
-    visualization_msgs::Marker arrow_marker;
-    arrow_marker.type = visualization_msgs::Marker::ARROW;
+    visualization_msgs::msg::Marker arrow_marker;
+    arrow_marker.type = visualization_msgs::msg::Marker::ARROW;
     arrow_marker.scale.x = 0.3;
     arrow_marker.scale.y = 0.15;
     arrow_marker.scale.z = 0.15;
@@ -213,7 +213,7 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     arrow_marker.pose.orientation = geometry_msgs::quaternion(0,0,psi);
 
     // create a non-interactive control which contains the box
-    visualization_msgs::InteractiveMarkerControl box_control;
+    visualization_msgs::msg::InteractiveMarkerControl box_control;
     box_control.always_visible = true;
     box_control.markers.push_back( box_marker );
     box_control.markers.push_back( arrow_marker );
@@ -226,14 +226,14 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
         // create a control which will move the box
         // this control does not contain any markers,
         // which will cause RViz to insert two arrows
-        visualization_msgs::InteractiveMarkerControl control;
+        visualization_msgs::msg::InteractiveMarkerControl control;
         control.name = "move_x";
         control.orientation.w = 1;
         control.orientation.x = 1;
         control.orientation.y = 0;
         control.orientation.z = 0;
         control.interaction_mode =
-          visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+          visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
 
         // add the control to the interactive marker
         int_marker.controls.push_back(control);
@@ -243,14 +243,14 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
         // create a control which will move the box
         // this control does not contain any markers,
         // which will cause RViz to insert two arrows
-        visualization_msgs::InteractiveMarkerControl control;
+        visualization_msgs::msg::InteractiveMarkerControl control;
         control.name = "move_y";
         control.orientation.w = 1;
         control.orientation.x = 0;
         control.orientation.y = 0;
         control.orientation.z = 1;
         control.interaction_mode =
-          visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+          visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
 
         // add the control to the interactive marker
         int_marker.controls.push_back(control);
@@ -260,14 +260,14 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
         // create a control which will move the box
         // this control does not contain any markers,
         // which will cause RViz to insert two arrows
-        visualization_msgs::InteractiveMarkerControl control;
+        visualization_msgs::msg::InteractiveMarkerControl control;
         control.name = "move_z";
         control.orientation.w = 1;
         control.orientation.x = 0;
         control.orientation.y = 1;
         control.orientation.z = 0;
         control.interaction_mode =
-          visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+          visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
 
         // add the control to the interactive marker
         int_marker.controls.push_back(control);
@@ -277,14 +277,14 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
         // create a control which will move the box
         // this control does not contain any markers,
         // which will cause RViz to insert two arrows
-        visualization_msgs::InteractiveMarkerControl control;
+        visualization_msgs::msg::InteractiveMarkerControl control;
         control.name = "move_psi";
         control.orientation.w = 1;
         control.orientation.x = 0;
         control.orientation.y = 1;
         control.orientation.z = 0;
         control.interaction_mode =
-          visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
+          visualization_msgs::msg::InteractiveMarkerControl::ROTATE_AXIS;
 
         // add the control to the interactive marker
         int_marker.controls.push_back(control);

@@ -21,7 +21,7 @@ public:
         WHITE, RED
     };
 
-    MarkerInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node), server("simple_marker") {
+    MarkerInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node), server("simple_marker", node) {
     }
 
     void commit();
