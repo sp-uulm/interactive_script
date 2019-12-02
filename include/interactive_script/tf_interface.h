@@ -20,7 +20,7 @@ public:
     TfInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node), tf_listener(tf_buffer) {
     }
 
-    std::optional<geometry_msgs::Pose> get_pose(const std::string& object);
+    std::optional<geometry_msgs::msg::Pose> get_pose(const std::string& object);
 };
 
 #endif // TF_INTERFACE_H
