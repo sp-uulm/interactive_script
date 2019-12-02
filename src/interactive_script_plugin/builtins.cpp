@@ -114,7 +114,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                            args[2].source.get(),
                            args[3].source.get(),
                     [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, psi_source = args[3].source, this, tokens = parser.tokens, original_psi = get<double>(args[3])](const auto& feedback) mutable {
-                        if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
+                        if (feedback->event_type == visualization_msgs::msg::InteractiveMarkerFeedback::MOUSE_UP) {
                             auto changes = make_shared<lua::rt::SourceChangeAnd>();
                             if (x_source && feedback->control_name == "move_x") {
                                 if (const auto& change = x_source->forceValue(feedback->pose.position.x))
@@ -129,7 +129,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                                     changes->changes.push_back(*change);
                             }
                             if (psi_source && feedback->control_name == "move_psi") {
-                                if (const auto& change = psi_source->forceValue(fmod(yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
+                                if (const auto& change = psi_source->forceValue(fmod(geometry_msgs::yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
                                     changes->changes.push_back(*change);
                             }
 
@@ -248,7 +248,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
             t["x"] = p ? p->position.x : 0;
             t["y"] = p ? p->position.y : 0;
             t["z"] = p ? p->position.z : 0;
-            t["psi"] = p ? yaw(p->orientation) : 0;
+            t["psi"] = p ? geometry_msgs::yaw(p->orientation) : 0;
 
             return {result};
         }
@@ -309,7 +309,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         marker.addPoint(get<double>(args[0]), get<double>(args[1]), get<double>(args[2]),
                                     args[0].source.get(), args[1].source.get(), args[2].source.get(),
             [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, this, tokens = parser.tokens](const auto& feedback) mutable {
-                if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
+                if (feedback->event_type == visualization_msgs::msg::InteractiveMarkerFeedback::MOUSE_UP) {
                     auto changes = make_shared<lua::rt::SourceChangeAnd>();
                     if (x_source && feedback->control_name == "move_x") {
                         if (const auto& change = x_source->forceValue(feedback->pose.position.x))
@@ -355,7 +355,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         marker.addPose(get<double>(args[0]), get<double>(args[1]), get<double>(args[2]), get<double>(args[3]),
                                     args[0].source.get(), args[1].source.get(), args[2].source.get(), args[3].source.get(),
             [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, psi_source = args[3].source, this, tokens = parser.tokens, original_psi = get<double>(args[3])](const auto& feedback) mutable {
-                if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
+                if (feedback->event_type == visualization_msgs::msg::InteractiveMarkerFeedback::MOUSE_UP) {
                     auto changes = make_shared<lua::rt::SourceChangeAnd>();
                     if (x_source && feedback->control_name == "move_x") {
                         if (const auto& change = x_source->forceValue(feedback->pose.position.x))
@@ -370,7 +370,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                             changes->changes.push_back(*change);
                     }
                     if (psi_source && feedback->control_name == "move_psi") {
-                        if (const auto& change = psi_source->forceValue(fmod(yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
+                        if (const auto& change = psi_source->forceValue(fmod(geometry_msgs::yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
                             changes->changes.push_back(*change);
                     }
 
@@ -483,7 +483,7 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
             (*t)["x"] = p.position.x;
             (*t)["y"] = p.position.y;
             (*t)["z"] = p.position.x;
-            (*t)["psi"] = yaw(p.orientation);
+            (*t)["psi"] = geometry_msgs::yaw(p.orientation);
 
             return {t};
         }
@@ -502,7 +502,7 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
             (*t)["x"] = p.position.x;
             (*t)["y"] = p.position.y;
             (*t)["z"] = p.position.x;
-            (*t)["psi"] = yaw(p.orientation);
+            (*t)["psi"] = geometry_msgs::yaw(p.orientation);
 
             return {t};
         }

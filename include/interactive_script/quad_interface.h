@@ -34,8 +34,8 @@ struct QuadcopterInterface {
     bool is_at_target(double tolerance = 0.1);
     
 private:
-    void on_pose_feedback(GoalHandle, Feedback feedback);
-    void on_result_feedback(Result result);
+    void on_pose_feedback(const GoalHandle&, const Feedback& feedback);
+    void on_result_feedback(const Result& result);
     
 };
 

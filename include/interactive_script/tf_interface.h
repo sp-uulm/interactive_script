@@ -17,7 +17,8 @@ private:
     tf2_ros::TransformListener tf_listener;
 
 public:
-    TfInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node), tf_listener(tf_buffer) {
+    TfInterface(const std::shared_ptr<rclcpp::Node>& node)
+     : node(node), tf_buffer(node->get_clock()), tf_listener(tf_buffer) {
     }
 
     std::optional<geometry_msgs::msg::Pose> get_pose(const std::string& object);

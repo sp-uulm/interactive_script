@@ -1,10 +1,10 @@
 /*
-  Copyright 2016 Lucas Walter
+  Copyright 2019 Thomas Witte
 */
 
 #include "interactive_script/interactive_script_plugin.h"
 #include "interactive_script/builtins.h"
-#include <pluginlib/class_list_macros.h>
+#include <pluginlib/class_list_macros.hpp>
 #include <QStringList>
 #include <QTimer>
 #include <QTextCursor>
@@ -13,7 +13,9 @@ namespace interactive_script_plugin
 {
 
 InteractiveScriptGui::InteractiveScriptGui()
-  : rqt_gui_cpp::Plugin()
+  : rqt_gui_cpp::Plugin(),
+    vis(node_),
+    live(node_)
 {
   // Constructor is called first before initPlugin function, needless to say.
 
@@ -70,7 +72,7 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
 
     if(!connect(&vis.signal, &SignalObject::setBlockValue,
                 ui_.blockly_widget, &BlocklyWidget::setBlockValue))
-        ROS_ERROR("could not connect signal setBlockValue");
+        RCLCPP_ERROR(node_->get_logger(), "could not connect signal setBlockValue");
 
     setlocale(LC_ALL, "C");
     onTextChanged();
@@ -144,7 +146,7 @@ void InteractiveScriptGui::onHighlightTokens(TokenMessage tokens) {
         cursor.setCharFormat(fmt);
     }
 
-    eval_paused = false;
+    eval_paused = old_eval_paused;
 }
 
 void InteractiveScriptGui::onRemoveFormatting() {
@@ -229,13 +231,15 @@ void InteractiveScriptGui::updateTf() {
     }
 
     if (setting_print_performance_statistics) {
-        ROS_INFO_STREAM_THROTTLE(1, "Total time [us]: " << vis.ps.total.count() << endl
-                                 << "- tokenize [us]: " << vis.ps.tokenize.count() << endl
-                                 << "- parse    [us]: " << vis.ps.parse.count() << endl
-                                 << "- lib/env  [us]: " << vis.ps.create_env.count() << endl
-                                 << "- execute  [us]: " << (vis.ps.execute-vis.ps.marker_interface).count() << endl
-                                 << "- marker   [us]: " << vis.ps.marker_interface.count() << endl
-                                 << "- apply sc [us]: " << vis.ps.source_changes.count() << endl);
+        auto& clock = *(node_->get_clock());
+        RCLCPP_INFO_STREAM_THROTTLE(node_->get_logger(), clock, 1,
+               "Total time [us]: " << vis.ps.total.count() << endl
+            << "- tokenize [us]: " << vis.ps.tokenize.count() << endl
+            << "- parse    [us]: " << vis.ps.parse.count() << endl
+            << "- lib/env  [us]: " << vis.ps.create_env.count() << endl
+            << "- execute  [us]: " << (vis.ps.execute-vis.ps.marker_interface).count() << endl
+            << "- marker   [us]: " << vis.ps.marker_interface.count() << endl
+            << "- apply sc [us]: " << vis.ps.source_changes.count() << endl);
     }
 }
 

@@ -26,12 +26,12 @@ bool QuadcopterInterface::is_at_target(double tolerance) {
         && fabs(current_target.position.z - current_position.position.z) < tolerance;
 }
 
-void QuadcopterInterface::on_pose_feedback(GoalHandle, Feedback feedback) {
+void QuadcopterInterface::on_pose_feedback(const GoalHandle&, const Feedback& feedback) {
     // feedback callback -> update the current_position and resume the user script
     current_position = feedback->current_pose.pose;
 }
 
-void QuadcopterInterface::on_result_feedback(Result) {
+void QuadcopterInterface::on_result_feedback(const Result&) {
     // finish callback -> make sure any wait() command in the user script terminates
     // by updating the current_position to the target position.
     current_position = current_target;

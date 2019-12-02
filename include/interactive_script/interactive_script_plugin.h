@@ -43,8 +43,8 @@ private:
 
     QWidget* widget_ = nullptr;
 
-    VisualizationInterpreter vis(node_);
-    LiveScriptInterpreter live(node_);
+    VisualizationInterpreter vis;
+    LiveScriptInterpreter live;
 
     bool eval_paused = false;
     bool is_shutdown = false;
