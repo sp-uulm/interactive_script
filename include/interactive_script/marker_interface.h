@@ -13,7 +13,7 @@ private:
     static constexpr auto WORLD_FRAME = "world";
 
     std::shared_ptr<rclcpp::Node> node;
-    interactive_markers::InteractiveMarkerServer server;
+    std::unique_ptr<interactive_markers::InteractiveMarkerServer> server;
     int n = 0;
 
 public:
@@ -21,7 +21,9 @@ public:
         WHITE, RED
     };
 
-    MarkerInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node), server("simple_marker", node) {
+    MarkerInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node) {
+        assert(node);
+        server = std::make_unique<interactive_markers::InteractiveMarkerServer>("simple_marker", node);    
     }
 
     void commit();

@@ -6,8 +6,8 @@ void MarkerInterface::update() {
 
 void MarkerInterface::commit() {
     auto start = std::chrono::steady_clock::now();
-    server.applyChanges();
-    server.clear();
+    server->applyChanges();
+    server->clear();
     n = 0;
     auto end = std::chrono::steady_clock::now();
     runtime += (end-start);
@@ -102,7 +102,7 @@ void MarkerInterface::addPoint(double x, double y, double z,
 
     // add the interactive marker to our collection &
     // tell the server to call processFeedback() when feedback arrives for it
-    server.insert(int_marker, func);
+    server->insert(int_marker, func);
 
     auto end = std::chrono::steady_clock::now();
     runtime += (end-start);
@@ -162,7 +162,7 @@ void MarkerInterface::addLine(double x, double y, double z, double x2, double y2
 
     // add the interactive marker to our collection &
     // tell the server to call processFeedback() when feedback arrives for it
-    server.insert(int_marker, [this](const auto& feedback) {
+    server->insert(int_marker, [this](const auto& feedback) {
         RCLCPP_INFO_STREAM(node->get_logger(), feedback->marker_name << " is now at "
               << feedback->pose.position.x << ", " << feedback->pose.position.y
               << ", " << feedback->pose.position.z );
@@ -292,7 +292,7 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
 
     // add the interactive marker to our collection &
     // tell the server to call processFeedback() when feedback arrives for it
-    server.insert(int_marker, func);
+    server->insert(int_marker, func);
     auto end = std::chrono::steady_clock::now();
     runtime += (end-start);
 }

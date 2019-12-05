@@ -43,8 +43,8 @@ private:
 
     QWidget* widget_ = nullptr;
 
-    VisualizationInterpreter vis;
-    LiveScriptInterpreter live;
+    std::unique_ptr<VisualizationInterpreter> vis;
+    std::unique_ptr<LiveScriptInterpreter> live;
 
     bool eval_paused = false;
     bool is_shutdown = false;
@@ -57,7 +57,7 @@ public slots:
     void onAppendTerminal(QString);
     void onTextChanged();
     void onRunScriptClicked();
-    void updateMarkerInterface() {vis.marker.update();}
+    void updateMarkerInterface() {vis->marker.update();}
     void updateTf();
 };
 

@@ -15,11 +15,11 @@
 using Gui = Ui::InteractiveScriptWidget;
 
 using TokenMessage = vector<LuaToken>;
-Q_DECLARE_METATYPE(TokenMessage);
+Q_DECLARE_METATYPE(TokenMessage)
 
 using SourceChangeMessage = shared_ptr<lua::rt::SourceChange>;
-Q_DECLARE_METATYPE(SourceChangeMessage);
-Q_DECLARE_METATYPE(QTextCharFormat);
+Q_DECLARE_METATYPE(SourceChangeMessage)
+Q_DECLARE_METATYPE(QTextCharFormat)
 
 /* The syntax highlighting goes completely haywire in the context of QObjects
  * and VisualizationInterpreter does not include the plugin header for the same

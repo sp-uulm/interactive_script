@@ -4,6 +4,11 @@
       An example C++ GUI plugin to create a great user interface.
     </description>
     <qtgui>
+      <group>
+        <label>Topics</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins related to ROS topics.</statustip>
+      </group>
       <label>Interactive Script</label>
       <icon type="theme">system-help</icon>
       <statustip>Great user interface to provide real value.</statustip>

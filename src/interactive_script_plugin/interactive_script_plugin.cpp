@@ -13,9 +13,7 @@ namespace interactive_script_plugin
 {
 
 InteractiveScriptGui::InteractiveScriptGui()
-  : rqt_gui_cpp::Plugin(),
-    vis(node_),
-    live(node_)
+  : rqt_gui_cpp::Plugin()
 {
   // Constructor is called first before initPlugin function, needless to say.
 
@@ -25,6 +23,10 @@ InteractiveScriptGui::InteractiveScriptGui()
 
 void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
 {
+    assert(node_);
+    vis = std::make_unique<VisualizationInterpreter>(node_);
+    live = std::make_unique<LiveScriptInterpreter>(node_);
+
     // access standalone command line arguments
     QStringList argv = context.argv();
     // create QWidget
@@ -46,31 +48,31 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
     connect(ui_.run_button, &QPushButton::clicked,
             this, &InteractiveScriptGui::onRunScriptClicked);
 
-    connect(&vis.signal, &SignalObject::changeEditorText,
+    connect(&vis->signal, &SignalObject::changeEditorText,
             this, &InteractiveScriptGui::onChangeEditorText);
-    connect(&vis.signal, &SignalObject::applySourceChanges,
+    connect(&vis->signal, &SignalObject::applySourceChanges,
             this, &InteractiveScriptGui::onApplySourceChanges);
-    connect(&vis.signal, &SignalObject::clearTerminal,
+    connect(&vis->signal, &SignalObject::clearTerminal,
             this, &InteractiveScriptGui::onClearTerminal);
-    connect(&vis.signal, &SignalObject::appendTerminal,
+    connect(&vis->signal, &SignalObject::appendTerminal,
             this, &InteractiveScriptGui::onAppendTerminal);
-    connect(&vis.signal, &SignalObject::highlightTokens,
+    connect(&vis->signal, &SignalObject::highlightTokens,
             this, &InteractiveScriptGui::onHighlightTokens);
-    connect(&vis.signal, &SignalObject::removeFormatting,
+    connect(&vis->signal, &SignalObject::removeFormatting,
             this, &InteractiveScriptGui::onRemoveFormatting);
 
-    connect(&live.signal, &SignalObject::changeEditorText,
+    connect(&live->signal, &SignalObject::changeEditorText,
             this, &InteractiveScriptGui::onChangeEditorText);
-    connect(&live.signal, &SignalObject::applySourceChanges,
+    connect(&live->signal, &SignalObject::applySourceChanges,
             this, &InteractiveScriptGui::onApplySourceChanges);
-    connect(&live.signal, &SignalObject::clearTerminal,
+    connect(&live->signal, &SignalObject::clearTerminal,
             this, &InteractiveScriptGui::onClearTerminal);
-    connect(&live.signal, &SignalObject::appendTerminal,
+    connect(&live->signal, &SignalObject::appendTerminal,
             this, &InteractiveScriptGui::onAppendTerminal);
-    connect(&live.signal, &SignalObject::highlightTokens,
+    connect(&live->signal, &SignalObject::highlightTokens,
             this, &InteractiveScriptGui::onHighlightTokens);
 
-    if(!connect(&vis.signal, &SignalObject::setBlockValue,
+    if(!connect(&vis->signal, &SignalObject::setBlockValue,
                 ui_.blockly_widget, &BlocklyWidget::setBlockValue))
         RCLCPP_ERROR(node_->get_logger(), "could not connect signal setBlockValue");
 
@@ -115,7 +117,7 @@ void InteractiveScriptGui::restoreSettings(const qt_gui_cpp::Settings& /*plugin_
 void InteractiveScriptGui::execute_vis() {
     if (!is_shutdown) {
         string s = ui_.editor->toPlainText().toStdString();
-        vis.run_script(s);
+        vis->run_script(s);
     }
 }
 
@@ -222,7 +224,7 @@ void InteractiveScriptGui::onTextChanged() {
 }
 
 void InteractiveScriptGui::onRunScriptClicked() {
-    live.run_script(ui_.editor->toPlainText().toStdString());
+    live->run_script(ui_.editor->toPlainText().toStdString());
 }
 
 void InteractiveScriptGui::updateTf() {
@@ -233,13 +235,13 @@ void InteractiveScriptGui::updateTf() {
     if (setting_print_performance_statistics) {
         auto& clock = *(node_->get_clock());
         RCLCPP_INFO_STREAM_THROTTLE(node_->get_logger(), clock, 1,
-               "Total time [us]: " << vis.ps.total.count() << endl
-            << "- tokenize [us]: " << vis.ps.tokenize.count() << endl
-            << "- parse    [us]: " << vis.ps.parse.count() << endl
-            << "- lib/env  [us]: " << vis.ps.create_env.count() << endl
-            << "- execute  [us]: " << (vis.ps.execute-vis.ps.marker_interface).count() << endl
-            << "- marker   [us]: " << vis.ps.marker_interface.count() << endl
-            << "- apply sc [us]: " << vis.ps.source_changes.count() << endl);
+               "Total time [us]: " << vis->ps.total.count() << endl
+            << "- tokenize [us]: " << vis->ps.tokenize.count() << endl
+            << "- parse    [us]: " << vis->ps.parse.count() << endl
+            << "- lib/env  [us]: " << vis->ps.create_env.count() << endl
+            << "- execute  [us]: " << (vis->ps.execute-vis->ps.marker_interface).count() << endl
+            << "- marker   [us]: " << vis->ps.marker_interface.count() << endl
+            << "- apply sc [us]: " << vis->ps.source_changes.count() << endl);
     }
 }
 

@@ -82,13 +82,15 @@ add_library(${PROJECT_NAME} SHARED
 
 # target_compile_definitions(interactive_script_component PRIVATE "COMPOSITION_BUILDING_DLL")
 target_link_libraries(${PROJECT_NAME}
-    rclcpp std_msgs
-    tf2
-    geometry_msgs
-    quad_common_utils
-    rqt_gui
-    rqt_gui_cpp
-    interactive_markers
+    ${rclcpp_LIBRARIES}
+    ${std_msgs_LIBRARIES}
+    ${tf2_LIBRARIES}
+    ${geometry_msgs_LIBRARIES}
+    ${quad_common_utils_LIBRARIES}
+    ${rqt_gui_LIBRARIES}
+    ${rqt_gui_cpp_LIBRARIES}
+    ${interactive_markers_LIBRARIES}
+    ${sp_trajectory_msgs_LIBRARIES}
     Qt5::Widgets Qt5::Core Qt5::WebEngineWidgets
     MiniLua
 )
