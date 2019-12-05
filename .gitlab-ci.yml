@@ -8,7 +8,7 @@ build:
    - mkdir -p ros_ws/src
    - cd ros_ws/src
    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@spgit.informatik.uni-ulm.de/quadrocopter/quad_common_utils.git -b ros2
-   - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@spgit.informatik.uni-ulm.de/quadrocopter/hector_quadrotor.git -b ros2
+   - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@spgit.informatik.uni-ulm.de/quadrocopter/se_trajectory_msgs.git -b ros2
    - git clone https://github.com/sp-uulm/MiniLua.git
    - cd ../..
    
