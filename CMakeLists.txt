@@ -73,6 +73,8 @@ include_directories(
   ${interactive_script_plugin_INCLUDE_DIRECTORIES}
 )
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 # Build component
 add_library(${PROJECT_NAME} SHARED
    ${interactive_script_plugin_SRCS}
