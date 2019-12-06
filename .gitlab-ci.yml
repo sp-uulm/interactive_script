@@ -4,7 +4,7 @@ build:
  stage: build
  script:
    - apt update
-   - apt --yes --force-yes install qtwebengine5-dev libboost-dev
+   - apt --yes --force-yes install qtwebengine5-dev libboost-dev ros-eloquent-rqt-gui-cpp
  
    - source /opt/ros/eloquent/setup.bash
    
