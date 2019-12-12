@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="ns" default="/tf_demo"/>
+  <arg name="trajectory_assignment" default="$(arg ns)/trajectory_assignment"/>
+  <arg name="trajectory_request" default="$(arg ns)/trajectory_request"/>
+  
+  <group ns="$(arg ns)">
+    <!-- trajectory_server_node -->
+    <node name="trajectory_server_node"
+          pkg="trajectory_server"
+          type="trajectory_server_node"
+          output="screen"
+          required="true">
+      <param name="trajectory_request_input"
+             type="string"
+             value="$(arg trajectory_request)"/>
+      <param name="trajectory_assignment_output"
+             type="string"
+             value="$(arg trajectory_assignment)"/>
+    </node>
+
+    <!-- drone1 -->
+    <include file="$(find trajectory_server)/launch/drone.launch" >
+      <arg name="x" value="-2" />
+      <arg name="y" value="0" />
+      <arg name="ns" value="$(arg ns)/helmet_yellow" />
+      <arg name="script_path" value="$(find interactive_script)/script/simple.lua" />
+      <arg name="trajectory_request" value="$(arg trajectory_request)"/>
+      <arg name="trajectory_assignment" value="$(arg trajectory_assignment)"/>
+    </include>
+
+  </group>
+</launch>

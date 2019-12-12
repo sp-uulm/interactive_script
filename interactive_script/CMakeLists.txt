@@ -18,6 +18,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rqt_gui_cpp REQUIRED)
 find_package(std_msgs REQUIRED)
@@ -57,6 +58,7 @@ set(interactive_script_plugin_UIS
 set(interactive_script_plugin_INCLUDE_DIRECTORIES
     include
     ${rclcpp_INCLUDE_DIRS}
+    ${ament_index_cpp_INCLUDE_DIRS}
     ${rqt_gui_cpp_INCLUDE_DIRS}
     ${quad_common_utils_INCLUDE_DIRS}
     ${interactive_markers_INCLUDE_DIRS}
@@ -85,6 +87,7 @@ add_library(${PROJECT_NAME} SHARED
 # target_compile_definitions(interactive_script_component PRIVATE "COMPOSITION_BUILDING_DLL")
 target_link_libraries(${PROJECT_NAME}
     ${rclcpp_LIBRARIES}
+    ${ament_index_cpp_LIBRARIES}
     ${std_msgs_LIBRARIES}
     ${tf2_LIBRARIES}
     ${geometry_msgs_LIBRARIES}
