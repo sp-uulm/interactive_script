@@ -129,6 +129,7 @@ set(interactive_script_plugin_SRCS
     src/interactive_script_plugin/builtins.cpp
     src/interactive_script_plugin/blocklybridge.cpp
     src/interactive_script_plugin/blocklywidget.cpp
+    src/interactive_script_plugin/load_save_util.cpp
 )
 
 set(interactive_script_plugin_HDRS
@@ -140,6 +141,7 @@ set(interactive_script_plugin_HDRS
     include/interactive_script/builtins.h
     include/interactive_script/blocklybridge.h
     include/interactive_script/blocklywidget.h
+    include/interactive_script/load_save_util.h
 )
 
 set(interactive_script_plugin_UIS

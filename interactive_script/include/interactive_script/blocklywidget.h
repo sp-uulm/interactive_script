@@ -19,6 +19,8 @@ private:
 public:
     explicit BlocklyWidget(QWidget *parent = nullptr);
     void setEditor(QPlainTextEdit *editor);
+    void loadXml(const QString& xml);
+    QString xml();
 
 signals:
 

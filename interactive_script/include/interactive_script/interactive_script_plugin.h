@@ -14,6 +14,7 @@
 #include <memory>
 #include <interactive_script/builtins.h>
 #include <interactive_script/blocklybridge.h>
+#include <interactive_script/load_save_util.h>
 
 namespace interactive_script_plugin
 {
@@ -61,6 +62,8 @@ public slots:
     void onRunScriptClicked();
     void updateMarkerInterface() {vis.marker.update();}
     void updateTf();
+    void on_save();
+    void on_load();
 };
 
 }  // namespace rqt_graph_editor

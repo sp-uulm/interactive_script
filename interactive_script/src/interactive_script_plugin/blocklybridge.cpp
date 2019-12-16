@@ -27,6 +27,7 @@ void BlocklyBridge::state_changed(const QString& xml, const QString& lua) {
     if (editor) {
         editor->setPlainText(lua);
     }
+    current_xml = xml;
 }
 
 void BlocklyBridge::setEditor(QPlainTextEdit *editor) {
