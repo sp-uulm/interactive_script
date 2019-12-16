@@ -47,6 +47,10 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
 
     connect(ui_.run_button, &QPushButton::clicked,
             this, &InteractiveScriptGui::onRunScriptClicked);
+    connect(ui_.save_button, &QPushButton::clicked,
+            this, &InteractiveScriptGui::on_save);
+    connect(ui_.load_button, &QPushButton::clicked,
+            this, &InteractiveScriptGui::on_load);
 
     connect(&vis->signal, &SignalObject::changeEditorText,
             this, &InteractiveScriptGui::onChangeEditorText);
@@ -242,6 +246,38 @@ void InteractiveScriptGui::updateTf() {
             << "- execute  [us]: " << (vis->ps.execute-vis->ps.marker_interface).count() << endl
             << "- marker   [us]: " << vis->ps.marker_interface.count() << endl
             << "- apply sc [us]: " << vis->ps.source_changes.count() << endl);
+    }
+}
+
+void InteractiveScriptGui::on_save() {
+    using namespace load_save;
+    if(auto file = save_dialog(ui_.tabWidget->currentWidget() == ui_.blockly_tab)) {
+        switch (file->format) {
+        case Filename::XML:
+            save_file(*file, ui_.blockly_widget->xml().toStdString());
+            ui_.tabWidget->setCurrentWidget(ui_.blockly_tab);
+            break;
+        case Filename::LUA:
+            save_file(*file, ui_.editor->toPlainText().toStdString());
+            ui_.tabWidget->setCurrentWidget(ui_.code_tab);
+            break;
+        }
+    }
+}
+
+void InteractiveScriptGui::on_load() {
+    using namespace load_save;
+    if (auto file = load_dialog()) {
+        switch (file->format) {
+        case Filename::XML:
+            ui_.blockly_widget->loadXml(QString::fromStdString(load_file(*file)));
+            ui_.tabWidget->setCurrentWidget(ui_.blockly_tab);
+            break;
+        case Filename::LUA:
+            ui_.editor->setPlainText(QString::fromStdString(load_file(*file)));
+            ui_.tabWidget->setCurrentWidget(ui_.code_tab);
+            break;
+        }
     }
 }
 

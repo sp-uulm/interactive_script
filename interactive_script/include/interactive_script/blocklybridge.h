@@ -12,6 +12,8 @@ public:
     explicit BlocklyBridge(QObject *parent = nullptr);
     void setEditor(QPlainTextEdit *editor);
 
+    QString current_xml = "";
+
 private:
     QPlainTextEdit *editor = nullptr;
 

@@ -1,6 +1,7 @@
 CMakeLists.txt
 include/interactive_script/builtins.h
 include/interactive_script/interactive_script_plugin.h
+include/interactive_script/load_save_util.h
 include/interactive_script/marker_interface.h
 include/interactive_script/quad_interface.h
 include/interactive_script/tf_interface.h
@@ -12,6 +13,7 @@ setup.py
 src/interactive_script_plugin/builtins.cpp
 src/interactive_script_plugin/interactive_script_plugin.cpp
 src/interactive_script_plugin/interactive_script_plugin.ui
+src/interactive_script_plugin/load_save_util.cpp
 src/interactive_script_plugin/marker_interface.cpp
 src/interactive_script_plugin/quad_interface.cpp
 src/interactive_script_plugin/tf_interface.cpp

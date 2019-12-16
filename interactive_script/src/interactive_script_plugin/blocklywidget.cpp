@@ -18,6 +18,15 @@ BlocklyWidget::BlocklyWidget(QWidget *parent) : QWebEngineView(parent)
     page()->setWebChannel(channel);
 }
 
+void BlocklyWidget::loadXml(const QString& xml) {
+    std::cout << "Blockly.Xml.clearWorkspaceAndLoadFromXml('" + xml.toStdString() + "', workspace);" << std::endl;
+    page()->runJavaScript("Blockly.Xml.clearWorkspaceAndLoadFromXml(Blockly.Xml.textToDom('" + xml + "'), workspace);");
+}
+
+QString BlocklyWidget::xml() {
+    return bridge->current_xml;
+}
+
 void BlocklyWidget::setEditor(QPlainTextEdit *editor) {
     bridge->setEditor(editor);
 }
