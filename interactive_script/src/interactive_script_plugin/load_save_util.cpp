@@ -50,7 +50,7 @@ std::string load_file(const Filename& filename) {
     std::string content, buffer;
     std::ifstream in(filename.name, std::ios_base::in);
     while (std::getline(in, buffer)) {
-        content += buffer;
+        content += buffer + '\n';
     }
     in.close();
 
