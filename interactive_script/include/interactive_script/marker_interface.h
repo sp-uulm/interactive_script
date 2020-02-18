@@ -14,7 +14,12 @@ private:
 
     std::shared_ptr<rclcpp::Node> node;
     std::unique_ptr<interactive_markers::InteractiveMarkerServer> server;
-    int n = 0;
+    int n_points = 0;
+    int n_lines = 0;
+    int n_poses = 0;
+    int cur_point = 0;
+    int cur_line = 0;
+    int cur_pose = 0;
 
 public:
     enum class Color {

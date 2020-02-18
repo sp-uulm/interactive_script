@@ -6,9 +6,30 @@ void MarkerInterface::update() {
 
 void MarkerInterface::commit() {
     auto start = std::chrono::steady_clock::now();
+
+    // erase points that are no longer needed
+    for (int i = cur_point; i < n_points; ++i) {
+        server->erase("point_marker_" + std::to_string(i));
+    }
+
+    // erase lines that are no longer needed
+    for (int i = cur_line; i < n_lines; ++i) {
+        server->erase("line_marker_" + std::to_string(i));
+    }
+
+    // erase poses that are no longer needed
+    for (int i = cur_pose; i < n_poses; ++i) {
+        server->erase("pose_marker_" + std::to_string(i));
+    }
+
+    n_points = cur_point;
+    n_lines = cur_line;
+    n_poses = cur_pose;
+
+    cur_point = cur_line = cur_pose = 0;
+
     server->applyChanges();
-    server->clear();
-    n = 0;
+
     auto end = std::chrono::steady_clock::now();
     runtime += (end-start);
 }
@@ -19,11 +40,31 @@ void MarkerInterface::addPoint(double x, double y, double z,
 
     auto start = std::chrono::steady_clock::now();
 
+    // check, whether we can reuse an existing point
+    if (cur_point < n_points) {
+        visualization_msgs::msg::InteractiveMarker m;
+        if (server->get("point_marker_" + std::to_string(cur_point), m)) {
+            if (free_x == (std::find_if(m.controls.begin(), m.controls.end(), [](const auto& control) {return control.name == "move_x";}) != m.controls.end()) &&
+                free_y == (std::find_if(m.controls.begin(), m.controls.end(), [](const auto& control) {return control.name == "move_y";}) != m.controls.end()) &&
+                free_z == (std::find_if(m.controls.begin(), m.controls.end(), [](const auto& control) {return control.name == "move_z";}) != m.controls.end())) {
+
+                // the marker controls are the same, we can reuse it
+                // TODO: check if the pose update is necessary
+                server->setPose("point_marker_" + std::to_string(cur_point), geometry_msgs::pose(x, y, z));
+                server->setCallback("point_marker_" + std::to_string(cur_point++), func);
+
+                auto end = std::chrono::steady_clock::now();
+                runtime += (end-start);
+                return;
+            }
+        }
+    }
+
     // create an interactive marker for our server
     visualization_msgs::msg::InteractiveMarker int_marker;
     int_marker.header.frame_id = WORLD_FRAME;
     int_marker.header.stamp=node->now();
-    int_marker.name = "point_marker_" + std::to_string(n++);
+    int_marker.name = "point_marker_" + std::to_string(cur_point++);
     //int_marker.description = "Simple 1-DOF Control";
 
     // create a grey box marker
@@ -111,11 +152,28 @@ void MarkerInterface::addPoint(double x, double y, double z,
 void MarkerInterface::addLine(double x, double y, double z, double x2, double y2, double z2, Color color, double width) {
     auto start = std::chrono::steady_clock::now();
 
+    // check, whether we can reuse the existing line
+    if (cur_line < n_lines) {
+        visualization_msgs::msg::InteractiveMarker m;
+        if (server->get("line_marker_" + std::to_string(cur_line), m)) {
+            if (m.controls.front().markers.front().points[0] == geometry_msgs::point(x, y, z) &&
+                m.controls.front().markers.front().points[1] == geometry_msgs::point(x2, y2, z2)) {
+
+                // the start and end of the line are the same -> keep it
+                cur_line++;
+
+                auto end = std::chrono::steady_clock::now();
+                runtime += (end-start);
+                return;
+            }
+        }
+    }
+
     // create an interactive marker for our server
     visualization_msgs::msg::InteractiveMarker int_marker;
     int_marker.header.frame_id = WORLD_FRAME;
     int_marker.header.stamp=node->now();
-    int_marker.name = "line_marker_" + std::to_string(n++);
+    int_marker.name = "line_marker_" + std::to_string(cur_line++);
     //int_marker.description = "Simple 1-DOF Control";
 
     // create a grey box marker
@@ -189,11 +247,32 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
                                interactive_markers::InteractiveMarkerServer::FeedbackCallback func) {
     auto start = std::chrono::steady_clock::now();
 
+    // check, whether we can reuse an existing point
+    if (cur_pose < n_poses) {
+        visualization_msgs::msg::InteractiveMarker m;
+        if (server->get("pose_marker_" + std::to_string(cur_pose), m)) {
+            if (free_x == (std::find_if(m.controls.begin(), m.controls.end(), [](const auto& control) {return control.name == "move_x";}) != m.controls.end()) &&
+                free_y == (std::find_if(m.controls.begin(), m.controls.end(), [](const auto& control) {return control.name == "move_y";}) != m.controls.end()) &&
+                free_z == (std::find_if(m.controls.begin(), m.controls.end(), [](const auto& control) {return control.name == "move_z";}) != m.controls.end()) &&
+                free_psi == (std::find_if(m.controls.begin(), m.controls.end(), [](const auto& control) {return control.name == "move_psi";}) != m.controls.end())) {
+
+                // the marker controls are the same, we can reuse it
+                // TODO: check if the pose update is necessary
+                server->setPose("pose_marker_" + std::to_string(cur_pose), geometry_msgs::pose(x, y, z, psi));
+                server->setCallback("pose_marker_" + std::to_string(cur_pose++), func);
+
+                auto end = std::chrono::steady_clock::now();
+                runtime += (end-start);
+                return;
+            }
+        }
+    }
+
     // create an interactive marker for our server
     visualization_msgs::msg::InteractiveMarker int_marker;
     int_marker.header.frame_id = WORLD_FRAME;
     int_marker.header.stamp=node->now();
-    int_marker.name = "pose_marker_" + std::to_string(n++);
+    int_marker.name = "pose_marker_" + std::to_string(cur_pose++);
     //int_marker.description = "Simple 1-DOF Control";
 
     int_marker.pose.position.x = x;
