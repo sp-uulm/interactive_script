@@ -18,7 +18,7 @@ private:
 
 public:
     enum class Color {
-        WHITE, RED
+        WHITE, RED, YELLOW, BLUE
     };
 
     MarkerInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node) {

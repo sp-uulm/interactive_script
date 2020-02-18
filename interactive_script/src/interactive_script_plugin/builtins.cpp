@@ -163,6 +163,102 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         return {nil()};
     }), false);
 
+    env.assign("takeoff", make_shared<cfunction>([this, &env, &parser](const vallist& args) mutable -> cfunction::result {
+        if (args.size() == 0) {
+            val target = env.getvar("__quad_target");
+            table& tab_target = *get<table_p>(target);
+
+            val pose = env.getvar("__quad_pose");
+            table& tab_pose = *get<table_p>(pose);
+
+
+            marker.addPose(tab_pose["x"].def_number(),
+                           tab_pose["y"].def_number(),
+                           1,
+                           tab_pose["psi"].def_number(),
+                           tab_pose["x"].source.get(),
+                           tab_pose["y"].source.get(),
+                           false,
+                           tab_pose["psi"].source.get(),
+                    [x_source = tab_pose["x"].source, y_source = tab_pose["y"].source, psi_source = tab_pose["psi"].source, this, tokens = parser.tokens, original_psi = tab_pose["psi"].def_number()](const auto& feedback) mutable {
+                        if (feedback->event_type == visualization_msgs::msg::InteractiveMarkerFeedback::MOUSE_UP) {
+                            auto changes = make_shared<lua::rt::SourceChangeAnd>();
+                            if (x_source && feedback->control_name == "move_x") {
+                                if (const auto& change = x_source->forceValue(feedback->pose.position.x))
+                                    changes->changes.push_back(*change);
+                            }
+                            if (y_source && feedback->control_name == "move_y") {
+                                if (const auto& change = y_source->forceValue(feedback->pose.position.y))
+                                    changes->changes.push_back(*change);
+                            }
+                            if (psi_source && feedback->control_name == "move_psi") {
+                                if (const auto& change = psi_source->forceValue(fmod(geometry_msgs::yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
+                                    changes->changes.push_back(*change);
+                            }
+
+                            // apply and highlight changes
+                            signal.removeFormatting();
+                            QTextCharFormat fmt;
+                            fmt.setBackground(Qt::red);
+                            fmt.setForeground(Qt::white);
+                            signal.applySourceChanges(changes, fmt);
+                        }
+                    });
+
+            marker.addLine(tab_pose["x"].def_number(),
+                           tab_pose["y"].def_number(),
+                           0,
+                           tab_pose["x"].def_number(),
+                           tab_pose["y"].def_number(),
+                           1,
+                           MarkerInterface::Color::YELLOW,
+                           0.1);
+
+            tab_pose["z"] = 1;
+
+            tab_target["x"] = tab_pose["x"];
+            tab_target["y"] = tab_pose["y"];
+            tab_target["z"] = tab_pose["z"];
+            tab_target["psi"] = tab_pose["psi"];
+
+            return {};
+        }
+
+        signal.appendTerminal("invalid args to takeoff()");
+        return {nil()};
+    }), false);
+
+    env.assign("land", make_shared<cfunction>([this, &env](const vallist& args) mutable -> cfunction::result {
+        if (args.size() == 0) {
+            val target = env.getvar("__quad_target");
+            table& tab_target = *get<table_p>(target);
+
+            val pose = env.getvar("__quad_pose");
+            table& tab_pose = *get<table_p>(pose);
+
+            marker.addLine(tab_pose["x"].def_number(),
+                           tab_pose["y"].def_number(),
+                           tab_pose["z"].def_number(),
+                           tab_pose["x"].def_number(),
+                           tab_pose["y"].def_number(),
+                           0,
+                           MarkerInterface::Color::YELLOW,
+                           0.1);
+
+            tab_pose["z"] = 0;
+
+            tab_target["x"] = tab_pose["x"];
+            tab_target["y"] = tab_pose["y"];
+            tab_target["z"] = tab_pose["z"];
+            tab_target["psi"] = tab_pose["psi"];
+
+            return {};
+        }
+
+        signal.appendTerminal("invalid args to land()");
+        return {nil()};
+    }), false);
+
     env.assign("sleep", make_shared<lua::rt::cfunction>([this, &env](const lua::rt::vallist& args) -> cfunction::result {
         if (args.size() != 1 || !args[0].isnumber()) {
             signal.appendTerminal("sleep requires a number argument");
@@ -257,7 +353,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         return {nil()};
     }), false);
 
-    env.assign("blockValue", make_shared<cfunction>([this, &env](const vallist& args) mutable -> cfunction::result {
+    env.assign("blockValue", make_shared<cfunction>([this](const vallist& args) mutable -> cfunction::result {
         if (args.size() != 3 || !args[0].isstring() || !args[1].isstring()) {
             signal.appendTerminal("invalid args to blockValue(id, field, val)");
             return {nil()};

@@ -138,6 +138,18 @@ void MarkerInterface::addLine(double x, double y, double z, double x2, double y2
         box_marker.color.b = 0.0;
         box_marker.color.a = 1.0;
         break;
+    case Color::YELLOW:
+        box_marker.color.r = 1.0;
+        box_marker.color.g = 1.0;
+        box_marker.color.b = 0.0;
+        box_marker.color.a = 1.0;
+        break;
+    case Color::BLUE:
+        box_marker.color.r = 0.0;
+        box_marker.color.g = 0.0;
+        box_marker.color.b = 1.0;
+        box_marker.color.a = 1.0;
+        break;
     }
 
     geometry_msgs::Point p1;
