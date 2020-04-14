@@ -402,6 +402,40 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
             signal.appendTerminal("point requires 3 number arguments");
             return {nil()};
         }
+
+        // TODO: do not copy the tokens into each closure
+        rosslt_marker.addPoint(
+                rosslt_marker.code_value([this, val = args[0], tokens = parser.tokens](int32_t, const std::string& new_val) {
+                    if (auto sc = val.forceValue(sto<double>(new_val)); sc) {
+                        // apply and highlight changes
+                        signal.removeFormatting();
+                        QTextCharFormat fmt;
+                        fmt.setBackground(Qt::red);
+                        fmt.setForeground(Qt::white);
+                        signal.applySourceChanges(*sc, fmt);
+                    }
+                }, args[0]),
+                rosslt_marker.code_value([this, val = args[1], tokens = parser.tokens](int32_t, const std::string& new_val) {
+                    if (auto sc = val.forceValue(sto<double>(new_val)); sc) {
+                        // apply and highlight changes
+                        signal.removeFormatting();
+                        QTextCharFormat fmt;
+                        fmt.setBackground(Qt::red);
+                        fmt.setForeground(Qt::white);
+                        signal.applySourceChanges(*sc, fmt);
+                    }
+                }, args[1]),
+                rosslt_marker.code_value([this, val = args[2], tokens = parser.tokens](int32_t, const std::string& new_val) {
+                    if (auto sc = val.forceValue(sto<double>(new_val)); sc) {
+                        // apply and highlight changes
+                        signal.removeFormatting();
+                        QTextCharFormat fmt;
+                        fmt.setBackground(Qt::red);
+                        fmt.setForeground(Qt::white);
+                        signal.applySourceChanges(*sc, fmt);
+                    }
+                }, args[2]));
+
         marker.addPoint(get<double>(args[0]), get<double>(args[1]), get<double>(args[2]),
                                     args[0].source.get(), args[1].source.get(), args[2].source.get(),
             [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, this, tokens = parser.tokens](const auto& feedback) mutable {

@@ -3,6 +3,7 @@
 
 #include "interactive_script/marker_interface.h"
 #include "interactive_script/quad_interface.h"
+#include "interactive_script/rosslt_interface.h"
 #include "interactive_script/tf_interface.h"
 #include "luainterpreter.h"
 #include "luaparser.h"
@@ -56,9 +57,10 @@ struct Interpreter {
 };
 
 struct VisualizationInterpreter {
-    VisualizationInterpreter(const std::shared_ptr<rclcpp::Node>& node) : marker(node), tf(node) {}
+    VisualizationInterpreter(const std::shared_ptr<rclcpp::Node>& node) : marker(node), rosslt_marker(node), tf(node) {}
 
     MarkerInterface marker;
+    RossltInterface rosslt_marker;
     TfInterface tf;
     SignalObject signal;
     std::atomic<bool> is_running {false};

@@ -27,6 +27,8 @@ find_package(tf2 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(quad_common_utils REQUIRED)
 find_package(interactive_markers REQUIRED)
+find_package(rosslt_lib REQUIRED)
+find_package(rosslt_msgs REQUIRED)
 
 find_package(Qt5 COMPONENTS Core Widgets WebEngineWidgets REQUIRED)
 find_package(MiniLua REQUIRED)
@@ -34,6 +36,7 @@ find_package(MiniLua REQUIRED)
 set(interactive_script_plugin_SRCS
     src/interactive_script_plugin/interactive_script_plugin.cpp
     src/interactive_script_plugin/marker_interface.cpp
+    src/interactive_script_plugin/rosslt_interface.cpp
     src/interactive_script_plugin/quad_interface.cpp
     src/interactive_script_plugin/tf_interface.cpp
     src/interactive_script_plugin/builtins.cpp
@@ -45,6 +48,7 @@ set(interactive_script_plugin_SRCS
 set(interactive_script_plugin_HDRS
     include/interactive_script/interactive_script_plugin.h
     include/interactive_script/marker_interface.h
+    include/interactive_script/rosslt_interface.h
     include/interactive_script/quad_interface.h
     include/interactive_script/tf_interface.h
     include/interactive_script/builtins.h
@@ -64,6 +68,8 @@ set(interactive_script_plugin_INCLUDE_DIRECTORIES
     ${rqt_gui_cpp_INCLUDE_DIRS}
     ${quad_common_utils_INCLUDE_DIRS}
     ${interactive_markers_INCLUDE_DIRS}
+    ${rosslt_lib_INCLUDE_DIRS}
+    ${rosslt_msgs_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5WebEngineWidgets_INCLUDE_DIRS}
     ${MiniLua_INCLUDE_DIRS}
@@ -97,6 +103,8 @@ target_link_libraries(${PROJECT_NAME}
     ${rqt_gui_LIBRARIES}
     ${rqt_gui_cpp_LIBRARIES}
     ${interactive_markers_LIBRARIES}
+    rosslt_lib::rosslt
+    ${rosslt_msgs_LIBRARIES}
     ${sp_trajectory_msgs_LIBRARIES}
     Qt5::Widgets Qt5::Core Qt5::WebEngineWidgets
     MiniLua
