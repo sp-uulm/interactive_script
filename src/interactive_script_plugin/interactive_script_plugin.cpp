@@ -123,21 +123,13 @@ void InteractiveScriptGui::removeFormatting() {
     cursor.setCharFormat(QTextCharFormat());
 }
 
-void InteractiveScriptGui::onHighlightTokens(TokenMessage tokens) {
-    bool old_eval_paused = eval_paused;
+void InteractiveScriptGui::onHighlightTokens(TokenMessage tokens, QTextCharFormat fmt) {
     eval_paused = true;
 
     QTextCursor cursor(ui_.editor->document());
 
-    // remove any formatting
-    removeFormatting();
-
     for (const auto& t : tokens) {
-        //cout << "highlight: " << t << endl;
-
-        QTextCharFormat fmt;
-        fmt.setBackground(Qt::red);
-        fmt.setForeground(Qt::white);
+        cout << "highlight: " << t << endl;
 
         cursor.setPosition(t.pos, QTextCursor::MoveAnchor);
         cursor.setPosition(t.pos+t.length, QTextCursor::KeepAnchor);

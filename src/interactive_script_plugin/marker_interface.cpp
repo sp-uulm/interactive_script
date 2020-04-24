@@ -45,6 +45,8 @@ void MarkerInterface::addPoint(double x, double y, double z,
     visualization_msgs::InteractiveMarkerControl box_control;
     box_control.always_visible = true;
     box_control.markers.push_back( box_marker );
+    box_control.name = "clicked";
+    box_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::BUTTON;
 
     // add the control to the interactive marker
     int_marker.controls.push_back( box_control );
@@ -217,6 +219,8 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     box_control.always_visible = true;
     box_control.markers.push_back( box_marker );
     box_control.markers.push_back( arrow_marker );
+    box_control.name = "clicked";
+    box_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::BUTTON;
     //box_control.orientation = geometry_msgs::quaternion(0,0,psi);
 
     // add the control to the interactive marker

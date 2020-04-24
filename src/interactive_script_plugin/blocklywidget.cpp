@@ -1,8 +1,15 @@
 #include "interactive_script/blocklywidget.h"
+#include <ros/package.h>
 
 BlocklyWidget::BlocklyWidget(QWidget *parent) : QWebEngineView(parent)
 {
-    load(QUrl("file:///home/thomas/catkin_ws/src/blockly/index.html"));
+    QString path = "file://"
+         + QString::fromStdString(ros::package::getPath("interactive_script_blockly"))
+         + "/../quadcopter/index.html";
+
+    std::cout << "Loading blockly URL: " << path.toStdString() << std::endl;
+
+    load(QUrl(path));
 
     bridge = new BlocklyBridge();
     channel = new QWebChannel(this);

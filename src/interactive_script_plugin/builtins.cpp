@@ -30,6 +30,13 @@ std::pair<Interpreter::ExecResult, eval_result_t> Interpreter::dostring(const st
     }
 }
 
+QTextCharFormat format(Qt::GlobalColor bg_color, Qt::GlobalColor fg_color = Qt::white) {
+    QTextCharFormat fmt;
+    fmt.setBackground(bg_color);
+    fmt.setForeground(fg_color);
+    return fmt;
+}
+
 void VisualizationInterpreter::run_script(std::string& script) {
     if (is_running.exchange(true)) { // avoid running scripts in parallel
         return;
@@ -114,7 +121,27 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                            args[2].source.get(),
                            args[3].source.get(),
                     [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, psi_source = args[3].source, this, tokens = parser.tokens, original_psi = get<double>(args[3])](const auto& feedback) mutable {
-                        if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
+                        if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK) {
+                            vector<LuaToken> tokens;
+                            signal.removeFormatting();
+
+                            if(x_source) {
+                                signal.highlightTokens(x_source->get_all_tokens(), format(Qt::red));
+                            }
+
+                            if(y_source) {
+                                signal.highlightTokens(y_source->get_all_tokens(), format(Qt::darkGreen));
+                            }
+
+                            if(z_source) {
+                                signal.highlightTokens(z_source->get_all_tokens(), format(Qt::blue));
+                            }
+
+                            if(psi_source) {
+                                signal.highlightTokens(psi_source->get_all_tokens(), format(Qt::darkCyan));
+                            }
+
+                        } else if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
                             auto changes = make_shared<lua::rt::SourceChangeAnd>();
                             if (x_source && feedback->control_name == "move_x") {
                                 if (const auto& change = x_source->forceValue(feedback->pose.position.x))
@@ -134,11 +161,13 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                             }
 
                             // apply and highlight changes
-                            signal.removeFormatting();
-                            QTextCharFormat fmt;
-                            fmt.setBackground(Qt::red);
-                            fmt.setForeground(Qt::white);
-                            signal.applySourceChanges(changes, fmt);
+                            if (feedback->control_name != "clicked") {
+                                signal.removeFormatting();
+                                QTextCharFormat fmt;
+                                fmt.setBackground(Qt::red);
+                                fmt.setForeground(Qt::white);
+                                signal.applySourceChanges(changes, fmt);
+                            }
                         }
                     });
 
@@ -286,6 +315,10 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                 return false;
             }
 
+            vector<LuaToken> get_all_tokens() const override {
+                return {};
+            }
+
             SignalObject& signal;
             string id;
             string field;
@@ -309,7 +342,23 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         marker.addPoint(get<double>(args[0]), get<double>(args[1]), get<double>(args[2]),
                                     args[0].source.get(), args[1].source.get(), args[2].source.get(),
             [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, this, tokens = parser.tokens](const auto& feedback) mutable {
-                if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
+                if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK) {
+                    vector<LuaToken> tokens;
+                    signal.removeFormatting();
+
+                    if(x_source) {
+                        signal.highlightTokens(x_source->get_all_tokens(), format(Qt::red));
+                    }
+
+                    if(y_source) {
+                        signal.highlightTokens(y_source->get_all_tokens(), format(Qt::darkGreen));
+                    }
+
+                    if(z_source) {
+                        signal.highlightTokens(z_source->get_all_tokens(), format(Qt::blue));
+                    }
+
+                } else if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
                     auto changes = make_shared<lua::rt::SourceChangeAnd>();
                     if (x_source && feedback->control_name == "move_x") {
                         if (const auto& change = x_source->forceValue(feedback->pose.position.x))
@@ -325,11 +374,13 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                     }
 
                     // apply and highlight changes
-                    signal.removeFormatting();
-                    QTextCharFormat fmt;
-                    fmt.setBackground(Qt::red);
-                    fmt.setForeground(Qt::white);
-                    signal.applySourceChanges(changes, fmt);
+                    if (feedback->control_name != "clicked") {
+                        signal.removeFormatting();
+                        QTextCharFormat fmt;
+                        fmt.setBackground(Qt::red);
+                        fmt.setForeground(Qt::white);
+                        signal.applySourceChanges(changes, fmt);
+                    }
                 }
             });
         return {};
@@ -355,7 +406,27 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         marker.addPose(get<double>(args[0]), get<double>(args[1]), get<double>(args[2]), get<double>(args[3]),
                                     args[0].source.get(), args[1].source.get(), args[2].source.get(), args[3].source.get(),
             [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, psi_source = args[3].source, this, tokens = parser.tokens, original_psi = get<double>(args[3])](const auto& feedback) mutable {
-                if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
+                if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK) {
+                    vector<LuaToken> tokens;
+                    signal.removeFormatting();
+
+                    if(x_source) {
+                        signal.highlightTokens(x_source->get_all_tokens(), format(Qt::red));
+                    }
+
+                    if(y_source) {
+                        signal.highlightTokens(y_source->get_all_tokens(), format(Qt::darkGreen));
+                    }
+
+                    if(z_source) {
+                        signal.highlightTokens(z_source->get_all_tokens(), format(Qt::blue));
+                    }
+
+                    if(psi_source) {
+                        signal.highlightTokens(psi_source->get_all_tokens(), format(Qt::darkCyan));
+                    }
+
+                } else if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP) {
                     auto changes = make_shared<lua::rt::SourceChangeAnd>();
                     if (x_source && feedback->control_name == "move_x") {
                         if (const auto& change = x_source->forceValue(feedback->pose.position.x))
@@ -375,11 +446,13 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                     }
 
                     // apply and highlight changes
-                    signal.removeFormatting();
-                    QTextCharFormat fmt;
-                    fmt.setBackground(Qt::red);
-                    fmt.setForeground(Qt::white);
-                    signal.applySourceChanges(changes, fmt);
+                    if (feedback->control_name != "clicked") {
+                        signal.removeFormatting();
+                        QTextCharFormat fmt;
+                        fmt.setBackground(Qt::red);
+                        fmt.setForeground(Qt::white);
+                        signal.applySourceChanges(changes, fmt);
+                    }
                 }
             });
         return {};
@@ -432,7 +505,7 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
             return {nil()};
         }
 
-        signal.highlightTokens(stmt.tokens);
+        signal.highlightTokens(stmt.tokens, format(Qt::magenta));
 
         std::this_thread::sleep_for(chrono::milliseconds(static_cast<long>(get<double>(args[0])*1000)));
 
@@ -448,7 +521,7 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
             return {nil()};
         }
 
-        signal.highlightTokens(stmt.tokens);
+        signal.highlightTokens(stmt.tokens, format(Qt::magenta));
 
         while (!quad.is_at_target()) {
             if (*cancelled)

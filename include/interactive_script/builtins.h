@@ -32,7 +32,7 @@ signals:
     void applySourceChanges(SourceChangeMessage, QTextCharFormat);
     void clearTerminal();
     void appendTerminal(QString);
-    void highlightTokens(TokenMessage);
+    void highlightTokens(TokenMessage, QTextCharFormat);
     void removeFormatting();
     void setBlockValue(QString, QString, QString);
 };

@@ -39,7 +39,7 @@ public:
     // void triggerConfiguration();
     Ui::InteractiveScriptWidget ui_;
 private:
-    bool setting_print_performance_statistics = true;
+    bool setting_print_performance_statistics = false;
 
     QWidget* widget_ = nullptr;
 
@@ -51,7 +51,7 @@ private:
 public slots:
     void onChangeEditorText(QString);
     void onApplySourceChanges(SourceChangeMessage msg, QTextCharFormat fmt);
-    void onHighlightTokens(TokenMessage);
+    void onHighlightTokens(TokenMessage, QTextCharFormat);
     void onRemoveFormatting();
     void onClearTerminal();
     void onAppendTerminal(QString);
