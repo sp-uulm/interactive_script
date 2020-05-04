@@ -72,6 +72,15 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
                 ui_.blockly_widget, &BlocklyWidget::setBlockValue))
         ROS_ERROR("could not connect signal setBlockValue");
 
+    if(!connect(&vis.signal, &SignalObject::highlightBlock,
+                ui_.blockly_widget, &BlocklyWidget::highlightBlock))
+        ROS_ERROR("could not connect signal highlightBlock");
+
+    if(!connect(&vis.signal, &SignalObject::highlightField,
+                ui_.blockly_widget, &BlocklyWidget::highlightField))
+        ROS_ERROR("could not connect signal highlightField");
+
+
     setlocale(LC_ALL, "C");
     onTextChanged();
 
@@ -113,7 +122,7 @@ void InteractiveScriptGui::restoreSettings(const qt_gui_cpp::Settings& /*plugin_
 void InteractiveScriptGui::execute_vis() {
     if (!is_shutdown) {
         string s = ui_.editor->toPlainText().toStdString();
-        vis.run_script(s);
+        vis.run_script(s, settings);
     }
 }
 
@@ -143,6 +152,7 @@ void InteractiveScriptGui::onRemoveFormatting() {
     // remove any formatting
     eval_paused = true;
     removeFormatting();
+    ui_.blockly_widget->removeHighlights();
     eval_paused = false;
 }
 
@@ -212,7 +222,7 @@ void InteractiveScriptGui::onTextChanged() {
 }
 
 void InteractiveScriptGui::onRunScriptClicked() {
-    live.run_script(ui_.editor->toPlainText().toStdString());
+    live.run_script(ui_.editor->toPlainText().toStdString(), settings);
 }
 
 void InteractiveScriptGui::updateTf() {
@@ -220,7 +230,7 @@ void InteractiveScriptGui::updateTf() {
         execute_vis();
     }
 
-    if (setting_print_performance_statistics) {
+    if (settings.print_performance_statistics) {
         ROS_INFO_STREAM_THROTTLE(1, "Total time [us]: " << vis.ps.total.count() << endl
                                  << "- tokenize [us]: " << vis.ps.tokenize.count() << endl
                                  << "- parse    [us]: " << vis.ps.parse.count() << endl
@@ -231,15 +241,25 @@ void InteractiveScriptGui::updateTf() {
     }
 }
 
-/*bool hasConfiguration() const
-{
+bool InteractiveScriptGui::hasConfiguration() const {
   return true;
 }
 
-void triggerConfiguration()
-{
+void InteractiveScriptGui::triggerConfiguration() {
+    ConfigDialog config;
+    config.ui->move_arrows->setChecked(settings.move_markers);
+    config.ui->display_dependencies->setChecked(settings.click_for_dependency_trace);
+    config.ui->dependency_colors->setChecked(settings.dependency_trace_colors);
+    config.ui->performance_statistics->setChecked(settings.print_performance_statistics);
+
+    if (config.exec() == QDialog::Accepted) {
+        settings.move_markers = config.ui->move_arrows->isChecked();
+        settings.click_for_dependency_trace = config.ui->display_dependencies->isChecked();
+        settings.dependency_trace_colors = config.ui->dependency_colors->isChecked();
+        settings.print_performance_statistics = config.ui->performance_statistics->isChecked();
+    }
   // Usually used to open a dialog to offer the user a set of configuration
-}*/
+}
 
 }  // namespace rqt_example_cpp
 PLUGINLIB_EXPORT_CLASS(interactive_script_plugin::InteractiveScriptGui, rqt_gui_cpp::Plugin)

@@ -20,6 +20,13 @@ using SourceChangeMessage = shared_ptr<lua::rt::SourceChange>;
 Q_DECLARE_METATYPE(SourceChangeMessage);
 Q_DECLARE_METATYPE(QTextCharFormat);
 
+struct InteractiveScriptSettings {
+    bool print_performance_statistics = false;
+    bool click_for_dependency_trace = true;
+    bool dependency_trace_colors = true;
+    bool move_markers = true;
+};
+
 /* The syntax highlighting goes completely haywire in the context of QObjects
  * and VisualizationInterpreter does not include the plugin header for the same
  * reason. To connect the two the signal object is used
@@ -35,6 +42,8 @@ signals:
     void highlightTokens(TokenMessage, QTextCharFormat);
     void removeFormatting();
     void setBlockValue(QString, QString, QString);
+    void highlightBlock(QString);
+    void highlightField(QString, QString);
 };
 
 struct Interpreter {
@@ -62,8 +71,8 @@ struct VisualizationInterpreter {
     LuaParser parser;
     PerformanceStatistics ps;
 
-    void run_script(std::string& script);
-    void populate_visualization_env(lua::rt::Environment& env, LuaParser& parser);
+    void run_script(std::string& script, const InteractiveScriptSettings& settings);
+    void populate_visualization_env(lua::rt::Environment& env, LuaParser& parser, const InteractiveScriptSettings& settings);
 };
 
 struct LiveScriptInterpreter {
@@ -75,7 +84,7 @@ struct LiveScriptInterpreter {
     SignalObject signal;
     LuaParser parser;
 
-    void run_script(const std::string& script);
+    void run_script(const std::string& script, const InteractiveScriptSettings& settings);
     void populate_live_env(lua::rt::Environment& env, const Async::cancel_t& cancelled);
 };
 

@@ -122,6 +122,7 @@ catkin_package(
 
 set(interactive_script_plugin_SRCS
     src/interactive_script_plugin/interactive_script_plugin.cpp
+    src/interactive_script_plugin/configdialog.cpp
     src/interactive_script_plugin/marker_interface.cpp
     src/interactive_script_plugin/quad_interface.cpp
     src/interactive_script_plugin/tf_interface.cpp
@@ -132,6 +133,7 @@ set(interactive_script_plugin_SRCS
 
 set(interactive_script_plugin_HDRS
     include/interactive_script/interactive_script_plugin.h
+    include/interactive_script/configdialog.h
     include/interactive_script/marker_interface.h
     include/interactive_script/quad_interface.h
     include/interactive_script/tf_interface.h
@@ -142,6 +144,7 @@ set(interactive_script_plugin_HDRS
 
 set(interactive_script_plugin_UIS
     src/interactive_script_plugin/interactive_script_plugin.ui
+    src/interactive_script_plugin/configdialog.ui
 )
 
 qt5_wrap_cpp(interactive_script_plugin_MOCS ${interactive_script_plugin_HDRS})

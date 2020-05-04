@@ -24,6 +24,9 @@ signals:
 
 public slots:
     void setBlockValue(QString, QString, QString);
+    void highlightBlock(QString);
+    void highlightField(QString, QString);
+    void removeHighlights();
 };
 
 #endif // BLOCKLYWIDGET_H

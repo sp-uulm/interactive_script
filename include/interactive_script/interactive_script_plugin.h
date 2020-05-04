@@ -10,6 +10,7 @@
 #include <ros/console.h>
 #include <ui_interactive_script_plugin.h>
 #include <QWidget>
+#include <interactive_script/configdialog.h>
 #include <memory>
 #include <interactive_script/builtins.h>
 #include <interactive_script/blocklybridge.h>
@@ -35,11 +36,12 @@ public:
     void removeFormatting();
 
     // Comment in to signal that the plugin has a way to configure it
-    // bool hasConfiguration() const;
-    // void triggerConfiguration();
+    bool hasConfiguration() const;
+    void triggerConfiguration();
     Ui::InteractiveScriptWidget ui_;
 private:
-    bool setting_print_performance_statistics = false;
+
+    InteractiveScriptSettings settings;
 
     QWidget* widget_ = nullptr;
 

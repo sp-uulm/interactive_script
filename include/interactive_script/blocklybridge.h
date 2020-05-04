@@ -17,6 +17,8 @@ private:
 
 signals:
     void highlight_block(QString id);
+    void highlight_field(QString id, QString field);
+    void remove_highlights();
     void set_field_value(QString id, QString field, QString value);
 
 public slots:

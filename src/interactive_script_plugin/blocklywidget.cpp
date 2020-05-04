@@ -25,3 +25,15 @@ void BlocklyWidget::setEditor(QPlainTextEdit *editor) {
 void BlocklyWidget::setBlockValue(QString id, QString field, QString value) {
     emit bridge->set_field_value(id, field, value);
 }
+
+void BlocklyWidget::highlightBlock(QString id) {
+    emit bridge->highlight_block(id);
+}
+
+void BlocklyWidget::highlightField(QString id, QString field) {
+    emit bridge->highlight_field(id, field);
+}
+
+void BlocklyWidget::removeHighlights() {
+    emit bridge->remove_highlights();
+}
