@@ -605,4 +605,13 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
         return {nil()};
     }), false);
 
+    env.assign("blockValue", make_shared<cfunction>([this, &env](const vallist& args) mutable -> cfunction::result {
+        if (args.size() != 3 || !args[0].isstring() || !args[1].isstring()) {
+            signal.appendTerminal("invalid args to blockValue(id, field, val)");
+            return {nil()};
+        }
+
+        return {args[2]};
+    }), false);
+
 }
