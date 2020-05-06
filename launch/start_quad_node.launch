@@ -63,4 +63,56 @@
              type="double"
              value="0" />
     </node>
+    
+    <!-- dummy_object -->
+    <node name="helm_blau"
+          pkg="interactive_script"
+          type="dummy_object"
+          output="screen"
+          required="true">
+      <param name="name"
+             type="string"
+             value="helm_blau" />
+      <param name="interactive_marker_topic"
+             type="string"
+             value="/simple_marker" />
+      <param name="x"
+             type="double"
+             value="2.0" />
+      <rosparam param="color">[0.0, 0.0, 1.0]</rosparam>
+    </node>
+    
+    <node name="helm_weiss"
+          pkg="interactive_script"
+          type="dummy_object"
+          output="screen"
+          required="true">
+      <param name="name"
+             type="string"
+             value="helm_weiss" />
+      <param name="interactive_marker_topic"
+             type="string"
+             value="/simple_marker" />
+      <param name="x"
+             type="double"
+             value="3.0" />
+      <rosparam param="color">[1.0, 1.0, 1.0]</rosparam>
+    </node>
+    
+    <node name="helm_gelb"
+          pkg="interactive_script"
+          type="dummy_object"
+          output="screen"
+          required="true">
+      <param name="name"
+             type="string"
+             value="helm_gelb" />
+      <param name="interactive_marker_topic"
+             type="string"
+             value="/simple_marker" />
+      <param name="x"
+             type="double"
+             value="4.0" />
+      <rosparam param="color">[1.0, 1.0, 0.0]</rosparam>
+    </node>
 </launch>
