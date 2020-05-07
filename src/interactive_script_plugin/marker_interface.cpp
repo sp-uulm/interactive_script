@@ -217,9 +217,9 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     visualization_msgs::Marker quad_marker;
     quad_marker.type = visualization_msgs::Marker::MESH_RESOURCE;
     quad_marker.mesh_resource = "package://trajectory_server/meshes/bebop.dae";
-    quad_marker.scale.x = 0.002;
-    quad_marker.scale.y = 0.002;
-    quad_marker.scale.z = 0.002;
+    quad_marker.scale.x = 0.001;
+    quad_marker.scale.y = 0.001;
+    quad_marker.scale.z = 0.001;
     quad_marker.color.r = 1.0;
     quad_marker.color.g = 1.0;
     quad_marker.color.b = 1.0;
