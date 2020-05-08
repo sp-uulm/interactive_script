@@ -8,6 +8,7 @@
 #include <QStringList>
 #include <QTimer>
 #include <QTextCursor>
+#include <QDir>
 
 namespace interactive_script_plugin
 {
@@ -103,6 +104,9 @@ void InteractiveScriptGui::initPlugin(qt_gui_cpp::PluginContext& context)
     timer2->start();
     connect(timer2, &QTimer::timeout,
             this,  &InteractiveScriptGui::updateTf);
+
+    // save the configuation at application start, to prevent loading the last subjects's solution
+    on_save();
 }
 
 void InteractiveScriptGui::shutdownPlugin()
@@ -247,7 +251,7 @@ void InteractiveScriptGui::updateTf() {
 
 void InteractiveScriptGui::on_save() {
     using namespace load_save;
-    if(auto file = save_dialog(ui_.tabWidget->currentWidget() == ui_.blockly_tab)) {
+    /*if(auto file = save_dialog(ui_.tabWidget->currentWidget() == ui_.blockly_tab)) {
         switch (file->format) {
         case Filename::XML:
             save_file(*file, ui_.blockly_widget->xml().toStdString());
@@ -258,12 +262,15 @@ void InteractiveScriptGui::on_save() {
             ui_.tabWidget->setCurrentWidget(ui_.code_tab);
             break;
         }
-    }
+    }*/
+
+    Filename f {"/data/save_" + std::to_string(time(nullptr)) + ".xml", Filename::XML};
+    save_file(f, ui_.blockly_widget->xml().toStdString());
 }
 
 void InteractiveScriptGui::on_load() {
     using namespace load_save;
-    if (auto file = load_dialog()) {
+/*    if (auto file = load_dialog()) {
         switch (file->format) {
         case Filename::XML:
             ui_.blockly_widget->loadXml(QString::fromStdString(load_file(*file)));
@@ -274,7 +281,11 @@ void InteractiveScriptGui::on_load() {
             ui_.tabWidget->setCurrentWidget(ui_.code_tab);
             break;
         }
-    }
+    }*/
+
+    Filename f {QDir("/data", "save_*.xml").entryList().back().toStdString(), Filename::XML};
+    ui_.blockly_widget->loadXml(QString::fromStdString(load_file(f)));
+    ui_.tabWidget->setCurrentWidget(ui_.blockly_tab);
 }
 
 bool InteractiveScriptGui::hasConfiguration() const {
