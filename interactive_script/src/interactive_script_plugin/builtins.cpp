@@ -94,10 +94,16 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
     env.assign("print", make_shared<lua::rt::cfunction>([this](const lua::rt::vallist& args) -> cfunction::result {
         stringstream ss;
         for (int i = 0; i < static_cast<int>(args.size()) - 1; ++i) {
-            ss << args[static_cast<unsigned>(i)].to_string() << "\t";
+            if (args[static_cast<unsigned>(i)].istable())
+                ss << args[static_cast<unsigned>(i)].literal() << "\t";
+            else
+                ss << args[static_cast<unsigned>(i)].to_string() << "\t";
         }
         if (!args.empty()) {
-            ss << args.back().to_string();
+            if (args.back().istable())
+                ss << args.back().literal();
+            else
+                ss << args.back().to_string();
         }
         signal.appendTerminal(QString::fromStdString(ss.str()));
         return {};
@@ -507,12 +513,17 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
 
         stringstream ss;
         for (int i = 0; i < static_cast<int>(args.size()) - 1; ++i) {
-            ss << args[static_cast<unsigned>(i)].to_string() << "\t";
+            if (args[static_cast<unsigned>(i)].istable())
+                ss << args[static_cast<unsigned>(i)].literal() << "\t";
+            else
+                ss << args[static_cast<unsigned>(i)].to_string() << "\t";
         }
         if (!args.empty()) {
-            ss << args.back().to_string();
+            if (args.back().istable())
+                ss << args.back().literal();
+            else
+                ss << args.back().to_string();
         }
-        cout << ss.str() << endl;
         signal.appendTerminal(QString::fromStdString(ss.str()));
         return {};
     }), false);
