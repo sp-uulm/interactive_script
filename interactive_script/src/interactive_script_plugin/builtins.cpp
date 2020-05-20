@@ -121,13 +121,13 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
             marker.addPose(get<double>(args[0]),
                            get<double>(args[1]),
                            get<double>(args[2]),
-                           get<double>(args[3]),
+                           get<double>(args[3]) * 2 * M_PI / 360.0,
                            args[0].source.get() && settings.move_markers,
                            args[1].source.get() && settings.move_markers,
                            args[2].source.get() && settings.move_markers,
                            args[3].source.get() && settings.move_markers,
                     [x_source = args[0].source, y_source = args[1].source, z_source = args[2].source, psi_source = args[3].source,
-                     this, settings, tokens = parser.tokens, original_psi = get<double>(args[3])](const auto& feedback) mutable {
+                     this, settings, tokens = parser.tokens, original_psi = get<double>(args[3])*M_PI/180.0](const auto& feedback) mutable {
                         if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK && settings.click_for_dependency_trace) {
                             vector<LuaToken> tokens;
                             signal.removeFormatting();
@@ -167,7 +167,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                                     changes->changes.push_back(*change);
                             }
                             if (psi_source && feedback->control_name == "move_psi") {
-                                if (const auto& change = psi_source->forceValue(fmod(yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
+                                if (const auto& change = psi_source->forceValue(fmod(yaw(feedback->pose.orientation) + original_psi, 2*M_PI) * 180.0/M_PI))
                                     changes->changes.push_back(*change);
                             }
 
@@ -287,7 +287,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
             t["x"] = p ? p->position.x : 0;
             t["y"] = p ? p->position.y : 0;
             t["z"] = p ? p->position.z : 0;
-            t["psi"] = p ? yaw(p->orientation) : 0;
+            t["psi"] = p ? yaw(p->orientation) * 180.0/M_PI : 0;
 
             return {result};
         }
@@ -569,7 +569,7 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
             return string {"Script execution cancelled!"};
 
         if (args.size() == 4 && args[0].isnumber() && args[1].isnumber() && args[2].isnumber() && args[3].isnumber()) {
-            quad.send_new_waypoint(geometry_msgs::pose(get<double>(args[0]), get<double>(args[1]), get<double>(args[2]), get<double>(args[3])));
+            quad.send_new_waypoint(geometry_msgs::pose(get<double>(args[0]), get<double>(args[1]), get<double>(args[2]), get<double>(args[3])/360.0 * 2 * M_PI));
 
             return {};
         }
@@ -607,7 +607,7 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
             (*t)["x"] = p.position.x;
             (*t)["y"] = p.position.y;
             (*t)["z"] = p.position.x;
-            (*t)["psi"] = yaw(p.orientation);
+            (*t)["psi"] = yaw(p.orientation) * 180.0/M_PI;
 
             return {t};
         }
