@@ -56,6 +56,9 @@ void VisualizationInterpreter::run_script(std::string& script, const Interactive
         break;
     case Interpreter::ExecResult::ERR_RUNTIME:
         signal.appendTerminal(QString::fromStdString(get<string>(s)));
+
+        // commit visualization even if the code produced an error or reached its visit limit
+        marker.commit();
         break;
     case Interpreter::ExecResult::NOERROR:
         {
