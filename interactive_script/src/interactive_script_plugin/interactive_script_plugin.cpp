@@ -264,8 +264,10 @@ void InteractiveScriptGui::on_save() {
         }
     }*/
 
-    Filename f {"/data/save_" + std::to_string(time(nullptr)) + ".xml", Filename::XML};
+    Filename f {"/data/save_" + std::to_string(time(nullptr)) + ".manual.xml", Filename::XML};
     save_file(f, ui_.blockly_widget->xml().toStdString());
+    ui_.terminal->setPlainText(QString::fromStdString(f.name + " saved"));
+    ROS_INFO_STREAM(f.name << " saved"); 
 }
 
 void InteractiveScriptGui::on_load() {
@@ -283,9 +285,11 @@ void InteractiveScriptGui::on_load() {
         }
     }*/
 
-    Filename f {QDir("/data", "save_*.xml").entryList().back().toStdString(), Filename::XML};
+    Filename f {"/data/" + QDir("/data", "*.manual.xml").entryList().back().toStdString(), Filename::XML};
     ui_.blockly_widget->loadXml(QString::fromStdString(load_file(f)));
     ui_.tabWidget->setCurrentWidget(ui_.blockly_tab);
+    ui_.terminal->setPlainText(QString::fromStdString(f.name + " loaded"));
+    ROS_INFO_STREAM(f.name << " loaded"); 
 }
 
 bool InteractiveScriptGui::hasConfiguration() const {

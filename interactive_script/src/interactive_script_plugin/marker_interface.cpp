@@ -266,6 +266,8 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
         control.orientation.x = 0;
         control.orientation.y = 0;
         control.orientation.z = 1;
+        control.orientation_mode =
+          visualization_msgs::InteractiveMarkerControl::INHERIT;
         control.interaction_mode =
           visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
 
@@ -283,6 +285,8 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
         control.orientation.x = 0;
         control.orientation.y = 1;
         control.orientation.z = 0;
+        control.orientation_mode =
+          visualization_msgs::InteractiveMarkerControl::INHERIT;
         control.interaction_mode =
           visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
 
@@ -300,6 +304,8 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
         control.orientation.x = 0;
         control.orientation.y = 1;
         control.orientation.z = 0;
+        control.orientation_mode =
+          visualization_msgs::InteractiveMarkerControl::INHERIT;
         control.interaction_mode =
           visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
 
