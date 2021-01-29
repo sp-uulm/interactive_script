@@ -1,6 +1,6 @@
 [submodule "MiniLua"]
 	path = MiniLua
-	url = git@github.com:sp-uulm/MiniLua.git
+	url = https://github.com/sp-uulm/MiniLua.git
 [submodule "interactive_script_blockly"]
 	path = interactive_script_blockly
-	url = git@github.com:sp-uulm/blockly.git
+	url = https://github.com/sp-uulm/blockly.git
