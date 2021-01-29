@@ -8,7 +8,7 @@
 #include "interactive_script/tf_interface.h"
 #include "luainterpreter.h"
 #include "luaparser.h"
-#include <quad_common_utils/async.h>
+#include "interactive_script/async.h"
 #include <ui_interactive_script_plugin.h>
 #include <QWidget>
 #include <chrono>

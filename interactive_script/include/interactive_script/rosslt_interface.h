@@ -11,7 +11,7 @@
 #include "luainterpreter.h"
 #include "luaparser.h"
 
-#include <quad_common_utils/geometry_msg_helper.h>
+#include "interactive_script/geometry_msg_helper.h"
 #include <string>
 #include <functional>
 #include <chrono>
