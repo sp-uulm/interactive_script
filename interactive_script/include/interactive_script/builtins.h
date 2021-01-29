@@ -4,6 +4,7 @@
 #include "interactive_script/marker_interface.h"
 #include "interactive_script/quad_interface.h"
 #include "interactive_script/rosslt_interface.h"
+#include "interactive_script/rosslt_demo_interface.h"
 #include "interactive_script/tf_interface.h"
 #include "luainterpreter.h"
 #include "luaparser.h"
@@ -72,9 +73,10 @@ struct VisualizationInterpreter {
 };
 
 struct LiveScriptInterpreter {
-    LiveScriptInterpreter(const std::shared_ptr<rclcpp::Node>& node) : quad(node), tf(node) {}
+    LiveScriptInterpreter(const std::shared_ptr<rclcpp::Node>& node) : quad(node), rosslt_demo(node), tf(node) {}
 
     QuadcopterInterface quad;
+    RossltDemoInterface rosslt_demo;
     TfInterface tf;
     Async async;
     SignalObject signal;

@@ -19,7 +19,7 @@ struct QuadcopterInterface {
 
     QuadcopterInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node) {
       
-        rclcpp_action::Client<Pose>::SharedPtr pose_client = rclcpp_action::create_client<Pose>(node, POSE_ACTION);
+        pose_client = rclcpp_action::create_client<Pose>(node, POSE_ACTION);
     }
 
     std::shared_ptr<rclcpp::Node> node;

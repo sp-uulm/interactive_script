@@ -37,6 +37,7 @@ void VisualizationInterpreter::run_script(std::string& script) {
 
     signal.clearTerminal();
     marker.runtime = chrono::duration<double>();
+    rosslt_marker.reset();
 
     auto exec_start = chrono::steady_clock::now();
     Interpreter interpreter {parser};
@@ -595,6 +596,49 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
 
         if (args.size() == 4 && args[0].isnumber() && args[1].isnumber() && args[2].isnumber() && args[3].isnumber()) {
             quad.send_new_waypoint(geometry_msgs::pose(get<double>(args[0]), get<double>(args[1]), get<double>(args[2]), get<double>(args[3])));
+
+            // create tracked pose from lua values
+            Tracked<geometry_msgs::msg::Pose> tracked_pose;
+
+            auto position = GET_FIELD(tracked_pose, position);
+
+            auto x_value = rosslt_demo.code_value([this, val = args[0], tokens = parser.tokens](int32_t, const std::string& new_val) {
+                if (auto sc = val.forceValue(sto<double>(new_val)); sc) {
+                    // apply and highlight changes
+                    signal.removeFormatting();
+                    QTextCharFormat fmt;
+                    fmt.setBackground(Qt::red);
+                    fmt.setForeground(Qt::white);
+                    signal.applySourceChanges(*sc, fmt);
+                }
+            }, args[0]);
+            SET_FIELD(position, x, x_value);
+            auto y_value = rosslt_demo.code_value([this, val = args[1], tokens = parser.tokens](int32_t, const std::string& new_val) {
+                if (auto sc = val.forceValue(sto<double>(new_val)); sc) {
+                    // apply and highlight changes
+                    signal.removeFormatting();
+                    QTextCharFormat fmt;
+                    fmt.setBackground(Qt::red);
+                    fmt.setForeground(Qt::white);
+                    signal.applySourceChanges(*sc, fmt);
+                }
+            }, args[1]);
+            SET_FIELD(position, y, y_value);
+            auto z_value = rosslt_demo.code_value([this, val = args[2], tokens = parser.tokens](int32_t, const std::string& new_val) {
+                if (auto sc = val.forceValue(sto<double>(new_val)); sc) {
+                    // apply and highlight changes
+                    signal.removeFormatting();
+                    QTextCharFormat fmt;
+                    fmt.setBackground(Qt::red);
+                    fmt.setForeground(Qt::white);
+                    signal.applySourceChanges(*sc, fmt);
+                }
+            }, args[2]);
+            SET_FIELD(position, z, z_value);
+
+            SET_FIELD(tracked_pose, position, position);
+
+            rosslt_demo.send_new_waypoint(tracked_pose);
 
             return {};
         }

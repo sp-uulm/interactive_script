@@ -1,12 +1,11 @@
-#ifndef ROSSLT_INTERFACE_H
-#define ROSSLT_INTERFACE_H
+#ifndef ROSSLT_DEMO_INTERFACE_H
+#define ROSSLT_DEMO_INTERFACE_H
 
 #include <memory>
 
 #include <rclcpp/rclcpp.hpp>
-#include "rosslt/tracked.h"
 #include "rosslt/trackingnode.h"
-#include "rosslt_msgs/msg/marker_tracked.hpp"
+#include "rosslt_msgs/msg/pose_tracked.hpp"
 
 #include "luainterpreter.h"
 #include "luaparser.h"
@@ -16,29 +15,21 @@
 #include <functional>
 #include <chrono>
 
-class RossltInterface {
+class RossltDemoInterface {
 private:
     static constexpr auto WORLD_FRAME = "world";
 
     std::unique_ptr<LocationManager> location_manager;
     std::shared_ptr<rclcpp::Node> node;
-    std::shared_ptr<rclcpp::Publisher<rosslt_msgs::msg::MarkerTracked>> marker_pub;
-
-    int n_points = 0;
-    int n_lines = 0;
-    int n_poses = 0;
+    std::shared_ptr<rclcpp::Publisher<rosslt_msgs::msg::PoseTracked>> pose_publisher;
 
 public:
     using Callback = std::function<void(int, const std::string&)>;
 
-    enum class Color {
-        WHITE, RED, YELLOW, BLUE
-    };
-
-    RossltInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node) {
+    RossltDemoInterface(const std::shared_ptr<rclcpp::Node>& node) : node(node) {
         using namespace rclcpp;
         location_manager = std::make_unique<LocationManager>(*node);
-        marker_pub = node->create_publisher<rosslt_msgs::msg::MarkerTracked>("tracked_marker", QoS(KeepLast(10)));
+        pose_publisher = node->create_publisher<rosslt_msgs::msg::PoseTracked>("target_pose", QoS(KeepLast(10)));
     }
 
     Tracked<double> code_value(const Callback& change_cb, const lua::rt::val& value) {
@@ -80,17 +71,9 @@ public:
         }
     }
 
-    void reset() {
-        n_poses = n_lines = n_points = 0;
-    }
-
-    void commit();
-
-    void update();
-
-    void addPoint(Tracked<double> x, Tracked<double> y, Tracked<double> z);
-    void addLine(double x, double y, double z, double x2, double y2, double z2, Color color = Color::WHITE, double width = 0.05);
-    void addPose(Tracked<double> x, Tracked<double> y, Tracked<double> z, Tracked<double> psi);
+    void send_new_waypoint(const Tracked<geometry_msgs::msg::Pose> &target);
+    geometry_msgs::msg::Pose get_current_pose();
+    bool is_at_target(double tolerance = 0.1);
 };
 
-#endif // ROSSLT_INTERFACE_H
+#endif // ROSSLT_DEMO_INTERFACE_H
