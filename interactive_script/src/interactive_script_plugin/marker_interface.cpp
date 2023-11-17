@@ -157,7 +157,8 @@ void MarkerInterface::addLine(double x, double y, double z, double x2, double y2
         visualization_msgs::msg::InteractiveMarker m;
         if (server->get("line_marker_" + std::to_string(cur_line), m)) {
             if (m.controls.front().markers.front().points[0] == geometry_msgs::point(x, y, z) &&
-                m.controls.front().markers.front().points[1] == geometry_msgs::point(x2, y2, z2)) {
+                m.controls.front().markers.front().points[1] == geometry_msgs::point(x2, y2, z2) &&
+                m.controls.front().markers.front().scale.x == width) {
 
                 // the start and end of the line are the same -> keep it
                 cur_line++;
@@ -325,6 +326,8 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
         control.orientation.z = 0;
         control.interaction_mode =
           visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
+        control.orientation_mode =
+          visualization_msgs::msg::InteractiveMarkerControl::FIXED;
 
         // add the control to the interactive marker
         int_marker.controls.push_back(control);
@@ -342,6 +345,8 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
         control.orientation.z = 1;
         control.interaction_mode =
           visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
+        control.orientation_mode =
+          visualization_msgs::msg::InteractiveMarkerControl::FIXED;
 
         // add the control to the interactive marker
         int_marker.controls.push_back(control);
@@ -359,6 +364,8 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
         control.orientation.z = 0;
         control.interaction_mode =
           visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
+        control.orientation_mode =
+          visualization_msgs::msg::InteractiveMarkerControl::FIXED;
 
         // add the control to the interactive marker
         int_marker.controls.push_back(control);
@@ -376,6 +383,8 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
         control.orientation.z = 0;
         control.interaction_mode =
           visualization_msgs::msg::InteractiveMarkerControl::ROTATE_AXIS;
+        control.orientation_mode =
+          visualization_msgs::msg::InteractiveMarkerControl::FIXED;
 
         // add the control to the interactive marker
         int_marker.controls.push_back(control);

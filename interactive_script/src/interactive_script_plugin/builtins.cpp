@@ -130,7 +130,7 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
                                     changes->changes.push_back(*change);
                             }
                             if (psi_source && feedback->control_name == "move_psi") {
-                                if (const auto& change = psi_source->forceValue(fmod(geometry_msgs::yaw(feedback->pose.orientation) + original_psi, 2*M_PI)))
+                                if (const auto& change = psi_source->forceValue(fmod(geometry_msgs::yaw(feedback->pose.orientation), 2*M_PI)))
                                     changes->changes.push_back(*change);
                             }
 
