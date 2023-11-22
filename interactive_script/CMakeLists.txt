@@ -22,10 +22,10 @@ find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rqt_gui_cpp REQUIRED)
 find_package(std_msgs REQUIRED)
-#find_package(sp_trajectory_msgs REQUIRED)
+find_package(sp_trajectory_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(geometry_msgs REQUIRED)
-#find_package(quad_common_utils REQUIRED)
+find_package(quad_common_utils REQUIRED)
 find_package(interactive_markers REQUIRED)
 find_package(rosslt_lib REQUIRED)
 find_package(rosslt_msgs REQUIRED)
@@ -60,8 +60,6 @@ set(interactive_script_plugin_HDRS
     include/interactive_script/blocklybridge.h
     include/interactive_script/blocklywidget.h
     include/interactive_script/load_save_util.h
-    include/interactive_script/geometry_msg_helper.h
-    include/interactive_script/async.h
 )
 
 set(interactive_script_plugin_UIS
@@ -81,7 +79,7 @@ set(interactive_script_plugin_INCLUDE_DIRECTORIES
     ${Qt5WebEngineWidgets_INCLUDE_DIRS}
     ${MiniLua_INCLUDE_DIRS}
     ${gesture_msgs_INCLUDE_DIRS}
-#    ${sp_trajectory_msgs_INCLUDE_DIRS}
+    ${sp_trajectory_msgs_INCLUDE_DIRS}
 )
 
 qt5_wrap_cpp(interactive_script_plugin_MOCS ${interactive_script_plugin_HDRS})
@@ -113,7 +111,7 @@ target_link_libraries(${PROJECT_NAME}
     ${interactive_markers_LIBRARIES}
     rosslt_lib::rosslt
     ${rosslt_msgs_LIBRARIES}
-#    ${sp_trajectory_msgs_LIBRARIES}
+    ${sp_trajectory_msgs_LIBRARIES}
     Qt5::Widgets Qt5::Core Qt5::WebEngineWidgets
     MiniLua
 )

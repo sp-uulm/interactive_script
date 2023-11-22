@@ -58,11 +58,11 @@
   <depend>rosslt_lib</depend>
   <depend>rosslt_msgs</depend>
   <depend>gesture_msgs</depend>
-  <!--<depend>quad_common_utils</depend>-->
+  <depend>quad_common_utils</depend>
   <depend>MiniLua</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
-  <!--<depend>sp_trajectory_msgs</depend>-->
+  <depend>sp_trajectory_msgs</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
