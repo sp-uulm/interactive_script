@@ -57,6 +57,7 @@
   <depend>interactive_markers</depend>
   <depend>rosslt_lib</depend>
   <depend>rosslt_msgs</depend>
+  <depend>gesture_msgs</depend>
   <!--<depend>quad_common_utils</depend>-->
   <depend>MiniLua</depend>
   <depend>tf2</depend>

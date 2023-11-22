@@ -353,6 +353,24 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
         signal.appendTerminal("invalid args to pose(object?)");
         return {nil()};
     }), false);
+    
+    env.assign("gesture", make_shared<cfunction>([this, &env](const vallist& args) mutable -> cfunction::result {
+        if (args.size() == 1 && args[0].isstring()) {
+            auto p = tf.get_pose("gesture_wand");
+
+            val result = make_shared<table>();
+            table& t = *get<table_p>(result);
+            t["x"] = p ? p->position.x : 0;
+            t["y"] = p ? p->position.y : 0;
+            t["z"] = p ? p->position.z : 0;
+            t["psi"] = p ? geometry_msgs::yaw(p->orientation) : 0;
+
+            return {result};
+        }
+
+        signal.appendTerminal("invalid args to gesture(string)");
+        return {nil()};
+    }), false);
 
     env.assign("blockValue", make_shared<cfunction>([this](const vallist& args) mutable -> cfunction::result {
         if (args.size() != 3 || !args[0].isstring() || !args[1].isstring()) {
@@ -682,6 +700,36 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
         }
 
         signal.appendTerminal("invalid args to pose(object?)");
+        return {nil()};
+    }), false);
+    
+    env.assign(string {"gesture"}, make_shared<lua::rt::cfunction>([this, cancelled](const lua::rt::vallist& args, const _LuaFunctioncall stmt) -> cfunction::result {
+        if (*cancelled)
+            return string {"Script execution cancelled!"};
+
+        if (args.size() == 1 && args[0].isstring()) {
+            signal.highlightTokens(stmt.tokens);
+            
+            gesture.clear();
+            
+            auto p = gesture.received(get<string>(args[0]));
+            while (!p) {
+                if (*cancelled)
+                    return string {"Script execution cancelled!"};
+                std::this_thread::sleep_for(chrono::milliseconds(20));
+                p = gesture.received(get<string>(args[0]));
+            }
+            
+            table_p t = make_shared<table>();
+            (*t)["x"] = p->position.x;
+            (*t)["y"] = p->position.y;
+            (*t)["z"] = p->position.x;
+            (*t)["psi"] = geometry_msgs::yaw(p->orientation);
+
+            return {t};
+        }
+
+        signal.appendTerminal("invalid args to gesture(string)");
         return {nil()};
     }), false);
 

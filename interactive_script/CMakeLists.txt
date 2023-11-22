@@ -29,6 +29,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(interactive_markers REQUIRED)
 find_package(rosslt_lib REQUIRED)
 find_package(rosslt_msgs REQUIRED)
+find_package(gesture_msgs REQUIRED)
 
 find_package(Qt5 COMPONENTS Core Widgets WebEngineWidgets REQUIRED)
 find_package(MiniLua REQUIRED)
@@ -36,6 +37,7 @@ find_package(MiniLua REQUIRED)
 set(interactive_script_plugin_SRCS
     src/interactive_script_plugin/interactive_script_plugin.cpp
     src/interactive_script_plugin/marker_interface.cpp
+    src/interactive_script_plugin/gesture_interface.cpp
     src/interactive_script_plugin/rosslt_interface.cpp
     src/interactive_script_plugin/rosslt_demo_interface.cpp
     src/interactive_script_plugin/quad_interface.cpp
@@ -49,6 +51,7 @@ set(interactive_script_plugin_SRCS
 set(interactive_script_plugin_HDRS
     include/interactive_script/interactive_script_plugin.h
     include/interactive_script/marker_interface.h
+    include/interactive_script/gesture_interface.h
     include/interactive_script/rosslt_interface.h
     include/interactive_script/rosslt_demo_interface.h
     include/interactive_script/quad_interface.h
@@ -77,6 +80,7 @@ set(interactive_script_plugin_INCLUDE_DIRECTORIES
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5WebEngineWidgets_INCLUDE_DIRS}
     ${MiniLua_INCLUDE_DIRS}
+    ${gesture_msgs_INCLUDE_DIRS}
 #    ${sp_trajectory_msgs_INCLUDE_DIRS}
 )
 

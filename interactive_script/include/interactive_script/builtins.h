@@ -2,6 +2,7 @@
 #define BUILTINS_H
 
 #include "interactive_script/marker_interface.h"
+#include "interactive_script/gesture_interface.h"
 #include "interactive_script/quad_interface.h"
 #include "interactive_script/rosslt_interface.h"
 #include "interactive_script/rosslt_demo_interface.h"
@@ -73,11 +74,12 @@ struct VisualizationInterpreter {
 };
 
 struct LiveScriptInterpreter {
-    LiveScriptInterpreter(const std::shared_ptr<rclcpp::Node>& node) : quad(node), rosslt_demo(node), tf(node) {}
+    LiveScriptInterpreter(const std::shared_ptr<rclcpp::Node>& node) : quad(node), rosslt_demo(node), tf(node), gesture(node) {}
 
     QuadcopterInterface quad;
     RossltDemoInterface rosslt_demo;
     TfInterface tf;
+    GestureInterface gesture;
     Async async;
     SignalObject signal;
     LuaParser parser;
