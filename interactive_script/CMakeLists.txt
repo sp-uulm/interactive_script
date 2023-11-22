@@ -132,6 +132,17 @@ install(DIRECTORY
   DESTINATION include
 )
 
+install(DIRECTORY
+  meshes/
+  DESTINATION share/${PROJECT_NAME}/meshes
+)
+
+install(DIRECTORY
+  launch/
+  DESTINATION share/${PROJECT_NAME}/launch
+)
+
+
 install(FILES plugin.xml
   DESTINATION share/${PROJECT_NAME}
 )

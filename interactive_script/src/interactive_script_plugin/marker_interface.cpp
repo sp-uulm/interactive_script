@@ -281,7 +281,7 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     int_marker.pose.position.z = z;
     int_marker.pose.orientation = geometry_msgs::quaternion();
 
-    // create a grey box marker
+    /*// create a grey box marker
     visualization_msgs::msg::Marker box_marker;
     box_marker.type = visualization_msgs::msg::Marker::CUBE;
     box_marker.scale.x = 0.3;
@@ -302,13 +302,26 @@ void MarkerInterface::addPose(double x, double y, double z, double psi,
     arrow_marker.color.g = 1.0;
     arrow_marker.color.b = 1.0;
     arrow_marker.color.a = 1.0;
-    arrow_marker.pose.orientation = geometry_msgs::quaternion(0,0,psi);
+    arrow_marker.pose.orientation = geometry_msgs::quaternion(0,0,psi);*/
+
+    visualization_msgs::msg::Marker quad_marker;
+    quad_marker.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
+    quad_marker.mesh_resource = "package://interactive_script/meshes/bebop.dae";
+    quad_marker.scale.x = 0.001;
+    quad_marker.scale.y = 0.001;
+    quad_marker.scale.z = 0.001;
+    quad_marker.color.r = 1.0;
+    quad_marker.color.g = 1.0;
+    quad_marker.color.b = 1.0;
+    quad_marker.color.a = 1.0;
+    quad_marker.pose.orientation = geometry_msgs::quaternion(0,0,psi);
 
     // create a non-interactive control which contains the box
     visualization_msgs::msg::InteractiveMarkerControl box_control;
     box_control.always_visible = true;
-    box_control.markers.push_back( box_marker );
-    box_control.markers.push_back( arrow_marker );
+    //box_control.markers.push_back( box_marker );
+    //box_control.markers.push_back( arrow_marker );
+    box_control.markers.push_back( quad_marker );
     //box_control.orientation = geometry_msgs::quaternion(0,0,psi);
 
     // add the control to the interactive marker
