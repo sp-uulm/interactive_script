@@ -5,12 +5,14 @@
 #include <rclcpp/rclcpp.hpp>
 #include <memory>
 #include <optional>
+#include <mutex>
 
 class GestureInterface {
 private:
     std::shared_ptr<rclcpp::Node> node;
     std::shared_ptr<rclcpp::Subscription<gesture_msgs::msg::Gesture>> gesture_sub;
     std::shared_ptr<gesture_msgs::msg::Gesture> last_msg = nullptr; 
+    std::mutex last_message_mutex;
 
 public:
     static constexpr auto GESTURE_TOPIC = "gesture";
