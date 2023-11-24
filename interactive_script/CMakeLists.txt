@@ -112,6 +112,7 @@ target_link_libraries(${PROJECT_NAME}
     rosslt_lib::rosslt
     ${rosslt_msgs_LIBRARIES}
     ${sp_trajectory_msgs_LIBRARIES}
+    ${gesture_msgs_LIBRARIES}
     Qt5::Widgets Qt5::Core Qt5::WebEngineWidgets
     MiniLua
 )

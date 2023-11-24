@@ -356,6 +356,27 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
     
     env.assign("gesture", make_shared<cfunction>([this, &env](const vallist& args) mutable -> cfunction::result {
         if (args.size() == 1 && args[0].isstring()) {
+            // update the quad pose, as the gesture function typically blocks
+            val pose = env.getvar("__quad_pose");
+            table& tab_pose = *get<table_p>(pose);
+
+            val target = env.getvar("__quad_target");
+            table& tab_target = *get<table_p>(target);
+
+            marker.addLine(tab_pose["x"].def_number(),
+                           tab_pose["y"].def_number(),
+                           tab_pose["z"].def_number(),
+                           tab_target["x"].def_number(),
+                           tab_target["y"].def_number(),
+                           tab_target["z"].def_number());
+
+            tab_pose["x"] = tab_target["x"];
+            tab_pose["y"] = tab_target["y"];
+            tab_pose["z"] = tab_target["z"];
+            tab_pose["psi"] = tab_target["psi"];
+        
+            // return the pose of the gesture_wand
+        
             auto p = tf.get_pose("gesture_wand");
 
             val result = make_shared<table>();
