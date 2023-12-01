@@ -30,6 +30,7 @@ find_package(interactive_markers REQUIRED)
 find_package(rosslt_lib REQUIRED)
 find_package(rosslt_msgs REQUIRED)
 find_package(gesture_msgs REQUIRED)
+find_package(nav2_msgs REQUIRED)
 
 find_package(Qt5 COMPONENTS Core Widgets WebEngineWidgets REQUIRED)
 find_package(MiniLua REQUIRED)
@@ -80,6 +81,7 @@ set(interactive_script_plugin_INCLUDE_DIRECTORIES
     ${MiniLua_INCLUDE_DIRS}
     ${gesture_msgs_INCLUDE_DIRS}
     ${sp_trajectory_msgs_INCLUDE_DIRS}
+    ${nav2_msgs_INCLUDE_DIRS}
 )
 
 qt5_wrap_cpp(interactive_script_plugin_MOCS ${interactive_script_plugin_HDRS})
@@ -113,6 +115,7 @@ target_link_libraries(${PROJECT_NAME}
     ${rosslt_msgs_LIBRARIES}
     ${sp_trajectory_msgs_LIBRARIES}
     ${gesture_msgs_LIBRARIES}
+    ${nav2_msgs_LIBRARIES}
     Qt5::Widgets Qt5::Core Qt5::WebEngineWidgets
     MiniLua
 )

@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+
+<launch version="0.1.0">
+  <arg name="ns"
+       description="Absolute or relative path in which all child nodes will be spawned."
+       default=""/>
+  <arg name="trajectory_assignment"
+       description="Absolute or relative path in which trajectory_assignments will be published and looked for in all child nodes."
+       default="$(var ns)/trajectory_assignment"/>
+  <arg name="trajectory_request"
+       description="Absolute or relative path in which trajectory_requests will be published and looked for in all child nodes."
+       default="$(var ns)/trajectory_request"/>
+  <arg name="trajectory_hold"
+       description="Absolute or relative path in which trajectory_holds will be published and looked for in all child nodes."
+       default="$(var ns)/trajectory_hold"/>
+  
+  <group scoped="true">
+    <let name="gns" value="$(var ns)"/>
+    <!-- Trajectory Server -->
+    <node name="sp_trajectory_server"
+          pkg="simple_trajectory_server"
+          exec="simple_trajectory_server_base"
+          output="screen">
+      <param name="trajectory_request_input"
+             value="$(var trajectory_request)"/>
+      <param name="trajectory_assignment_output"
+             value="$(var trajectory_assignment)"/>
+      <param name="trajectory_hold"
+             value="$(var trajectory_hold)"/>
+      <param name="min_x"
+             value="-10.0"/>
+      <param name="min_y"
+             value="-10.0"/>
+      <param name="max_x"
+             value="10.0"/>
+      <param name="max_y"
+             value="10.0"/>
+      <param name="max_velocity"
+             value="1.5"/>
+      <param name="safety_distance"
+             value="0.01"/>
+    </node>
+
+    <node name="simple_trajectory_visualizer"
+          pkg="simple_trajectory_visualizer"
+          exec="simple_trajectory_visualizer_base"
+          output="screen">
+      <param name="trajectory_visualization_input"
+             value="$(var trajectory_assignment)"/>
+      <param name="trajectory_assignment_input"
+             value="$(var trajectory_assignment)"/>
+      <param name="trajectory_request_output"
+             value="$(var trajectory_request)"/>
+      <param name="trajectory_hold"
+             value="$(var trajectory_hold)"/>
+      <param name="trajectory_marker_output"
+             value="trajectory_marker"/>
+      <param name="obstacles_input"
+             value="static_obstacles"/>
+    </node>
+
+    <!-- rviz args="-d $(find-pkg-share sp_trajectory_launch)/config/base.rviz" -->
+    <node name="rviz2"
+          pkg="rviz2"
+          exec="rviz2"
+          />
+
+    <node name="trajectory_client"
+          pkg="simple_trajectory_client"
+          exec="simple_trajectory_client_base"
+          output="screen">
+      <param name="x"
+             value="0.0"/>
+      <param name="y"
+             value="0.0"/>
+      <param name="z"
+             value="1.0"/>
+      <param name="name"
+             value="quad"/>
+      <param name="trajectory_assignment_input"
+             value="$(var trajectory_assignment)"/>
+      <param name="trajectory_request_output"
+             value="$(var trajectory_request)"/>
+      <param name="trajectory_hold"
+             value="$(var trajectory_hold)"/>
+      <param name="se_visualization"
+             value="se_visualization"/>
+      <param name="target_output"
+             value="target"/>
+      <param name="quad_speed"
+             value="1.0" />
+    </node>
+
+    <node name="quad_node"
+          pkg="quad_node"
+          exec="quad_node"
+          output="screen">
+      <param name="name"
+             value="quad"/>
+      <param name="x"
+             value="0.0"/>
+      <param name="y"
+             value="0.0"/>
+      <param name="z"
+             value="1.0"/>
+      <param name="target_input"
+             value="target"/>
+    </node>
+
+    <node name="virtual_gesture_wand"
+          pkg="interactive_tf_publisher"
+          exec="tf_publisher_node"
+          output="screen"/>
+
+  </group>
+</launch>

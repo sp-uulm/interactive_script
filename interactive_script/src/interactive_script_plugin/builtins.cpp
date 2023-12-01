@@ -384,6 +384,8 @@ void VisualizationInterpreter::populate_visualization_env(Environment& env, LuaP
             t["x"] = p ? p->position.x : 0;
             t["y"] = p ? p->position.y : 0;
             t["z"] = p ? p->position.z : 0;
+            t["phi"] = p ? geometry_msgs::roll(p->orientation) : 0;
+            t["theta"] = p ? geometry_msgs::pitch(p->orientation) : 0;
             t["psi"] = p ? geometry_msgs::yaw(p->orientation) : 0;
 
             return {result};
@@ -714,7 +716,7 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
             table_p t = make_shared<table>();
             (*t)["x"] = p.position.x;
             (*t)["y"] = p.position.y;
-            (*t)["z"] = p.position.x;
+            (*t)["z"] = p.position.z;
             (*t)["psi"] = geometry_msgs::yaw(p.orientation);
 
             return {t};
@@ -744,7 +746,9 @@ void LiveScriptInterpreter::populate_live_env(lua::rt::Environment &env, const A
             table_p t = make_shared<table>();
             (*t)["x"] = p->position.x;
             (*t)["y"] = p->position.y;
-            (*t)["z"] = p->position.x;
+            (*t)["z"] = p->position.z;
+            (*t)["phi"] = geometry_msgs::roll(p->orientation);
+            (*t)["theta"] = geometry_msgs::pitch(p->orientation);
             (*t)["psi"] = geometry_msgs::yaw(p->orientation);
 
             return {t};

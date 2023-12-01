@@ -2,7 +2,7 @@
 #define QUAD_INTERFACE_H
 
 #include <rclcpp_action/rclcpp_action.hpp>
-#include <sp_trajectory_msgs/action/pose.hpp>
+#include <nav2_msgs/action/navigate_to_pose.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <quad_common_utils/geometry_msg_helper.h>
 
@@ -11,7 +11,7 @@ struct QuadcopterInterface {
     static constexpr auto WORLD_FRAME = "world";
     static constexpr auto POSE_ACTION = "action/pose";
 
-    using Pose = sp_trajectory_msgs::action::Pose;
+    using Pose = nav2_msgs::action::NavigateToPose;
     using Goal = std::shared_ptr<const Pose::Goal>;
     using Feedback = std::shared_ptr<const Pose::Feedback>;
     using Result = rclcpp_action::ClientGoalHandle<Pose>::WrappedResult;

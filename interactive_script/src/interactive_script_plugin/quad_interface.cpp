@@ -3,8 +3,8 @@
 void QuadcopterInterface::send_new_waypoint(const geometry_msgs::msg::Pose &target) {
 
     Pose::Goal goal;
-    goal.target_pose.pose = target;
-    goal.target_pose.header.frame_id = WORLD_FRAME;
+    goal.pose.pose = target;
+    goal.pose.header.frame_id = WORLD_FRAME;
 
     current_target = target;
 
